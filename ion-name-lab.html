@@ -1,0 +1,883 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ion Name Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;700&family=Poppins:wght@600;700&display=swap">
+<style>
+/* Layout: one guided column, numbered steps, a criss-cross lab with typed formula and name checks. */
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#16233a; --head:#1E3A5F; --muted:#55627a;
+  --navy:#1E3A5F; --gold:#A97F0F; --heat:#CC4B31; --cool:#2D6CA2; --ok:#2e7d4f;
+  --tint-navy:#e9eef6; --tint-gold:#fbf5e6; --line:#d6dde9;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b2d; --card:#172840; --text:#e8eef8; --head:#cfe0f5; --muted:#a9b6cc;
+    --navy:#2d4f7a; --gold:#d9a93a; --heat:#e0705a; --cool:#5a9ad6; --ok:#5fbf86;
+    --tint-navy:#1d3352; --tint-gold:#2b2412; --line:#2c4262; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b2d; --card:#172840; --text:#e8eef8; --head:#cfe0f5; --muted:#a9b6cc;
+  --navy:#2d4f7a; --gold:#d9a93a; --heat:#e0705a; --cool:#5a9ad6; --ok:#5fbf86;
+  --tint-navy:#1d3352; --tint-gold:#2b2412; --line:#2c4262; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:17px;line-height:1.55}
+h1,h2,h3,h4{font-family:Poppins,system-ui,sans-serif;color:var(--head);line-height:1.2;margin:0}
+.wrap{max-width:960px;margin:0 auto;padding:16px 16px 40px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{font-family:Poppins,sans-serif;font-weight:700;font-size:20px;color:var(--head)}
+.brand small{display:block;font-family:'Atkinson Hyperlegible',sans-serif;font-weight:400;font-size:14px;color:var(--muted)}
+#dots{display:flex;gap:8px;flex-wrap:wrap}
+.dot{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--text);font:700 16px Poppins,sans-serif;cursor:pointer}
+.dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.cur{border-color:var(--gold);box-shadow:0 0 0 3px var(--tint-gold)}
+.dot.lock{opacity:.45;cursor:not-allowed}
+.mission{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;min-width:0}
+.kicker{font-size:14px;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:0 0 4px}
+.mission h2{font-size:28px;margin-bottom:6px}
+.intro{color:var(--muted);margin:0 0 4px}
+.step{border-top:1px dashed var(--line);padding-top:16px;margin-top:18px;min-width:0}
+.step h3{display:flex;gap:10px;align-items:center;margin:0 0 10px;font-size:20px}
+.num{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;display:inline-grid;place-items:center;font-size:15px;flex:none;font-family:Poppins,sans-serif;font-weight:700}
+.q{font-size:19px;font-weight:700;margin:4px 0 0}
+.opts{display:grid;gap:8px;margin:10px 0}
+.opt{min-height:48px;text-align:left;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:var(--tint-navy);color:var(--text);font:inherit;font-size:17px;cursor:pointer}
+.opt.sel{border-color:var(--cool);background:var(--card);box-shadow:inset 0 0 0 1px var(--cool)}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.sel){opacity:.6}
+.btn{min-height:48px;padding:10px 18px;border-radius:12px;border:0;font:700 16px Poppins,sans-serif;cursor:pointer;background:var(--tint-navy);color:var(--text)}
+.btn.primary{background:var(--navy);color:#fff}
+.btn.gold{background:var(--gold);color:#fff}
+.btn.ghost{background:transparent;border:2px solid var(--navy);color:var(--text)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.locked{padding:14px;border-radius:12px;background:var(--tint-gold);border:1px dashed var(--gold)}
+.note{color:var(--muted);margin:8px 0 0}
+.banner{background:var(--navy);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700;margin-bottom:12px}
+.banner .btn{background:#fff;color:var(--navy);margin-top:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px}
+.lbl{font-size:14px;color:var(--muted);min-width:130px;padding-top:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
+.chip{min-height:48px;padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--text);font:inherit;cursor:pointer}
+.chip.on{background:var(--cool);border-color:var(--cool);color:#fff}
+.chip b{font-family:'IBM Plex Mono',monospace;font-weight:500}
+
+/* Criss-cross tiles */
+.cross{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;margin:10px 0}
+.tile{background:var(--tint-navy);border-radius:14px;padding:14px;text-align:center;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tile .tn{font-size:14px;color:var(--muted)}
+.tile b.sym{display:block;font-family:'IBM Plex Mono',monospace;font-size:24px;overflow-wrap:anywhere}
+.slotwrap{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:4px 0}
+.sl{font-size:14px;color:var(--muted)}
+.slot{min-width:64px;min-height:52px;padding:0 12px;border:2px dashed var(--muted);border-radius:12px;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:24px;background:var(--card);color:var(--muted);cursor:pointer}
+.slot.filled{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.slot.target{border-color:var(--gold);background:var(--tint-gold);color:var(--text)}
+.chip-drag{min-height:48px;padding:10px 16px;border:0;border-radius:999px;background:var(--gold);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;margin-top:auto}
+button.slot{font-family:'IBM Plex Mono',monospace;line-height:1.2}
+.chip-drag.on{outline:3px solid var(--cool);outline-offset:3px}
+.chip-drag.used{opacity:.5}
+.x{font-size:26px;color:var(--gold);font-weight:700;text-align:center;align-self:center;pointer-events:none}
+.dragghost{position:fixed;left:0;top:0;pointer-events:none;z-index:1000;transform:translate(-50%,-50%);padding:10px 16px;border-radius:999px;background:var(--gold);color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);white-space:nowrap}
+.crosslog{grid-column:1/-1;font-size:16px;color:var(--text);background:var(--tint-gold);border-radius:12px;padding:10px 12px;margin:0}
+.crosslog.bad{border:2px solid var(--heat)}
+
+/* Your turn: type the formula and the name */
+.turn{background:var(--tint-navy);border-radius:14px;padding:14px;margin:12px 0}
+.turn h4{margin:0 0 8px}
+.trow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0}
+.trow label{font-weight:700;min-width:84px}
+.ans{flex:1;min-width:180px;min-height:48px;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:19px}
+.ans:focus{outline:3px solid var(--cool);outline-offset:1px}
+.fb{margin:6px 0 0;min-height:1.4em;font-weight:700}
+.fb.good{color:var(--ok)}
+.fb.bad{color:var(--heat)}
+.fb.hint{color:var(--text);font-weight:400}
+
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.cv{width:100%;height:170px;display:block;border-radius:12px;background:var(--tint-navy);margin:8px 0}
+.ioncard{background:var(--tint-navy);border-radius:12px;padding:14px;font-size:18px;margin:8px 0}
+.big{font-size:28px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.steplist{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.steplist li{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:12px;background:var(--card);border:1px solid var(--line);flex-wrap:wrap}
+.steplist li.now{border-color:var(--gold);background:var(--tint-gold)}
+.steplist li.tick{opacity:.8}
+.steplist .box{width:30px;height:30px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;flex:none;font-weight:700;font-family:Poppins,sans-serif}
+.steplist .tick .box{background:var(--ok);border-color:var(--ok);color:#fff}
+.steplist .now .box{border-color:var(--gold)}
+.steplist .st{flex:1;min-width:0;padding-top:4px}
+.compare{background:var(--tint-navy);border-radius:12px;padding:14px;margin-bottom:12px}
+.compare p{margin:4px 0}
+.ok{color:var(--ok);font-weight:700}
+.warn{color:var(--heat);font-weight:700}
+.hint{background:var(--tint-gold);border-radius:12px;padding:10px 12px;margin:10px 0 0}
+.science{background:var(--tint-navy);border-radius:12px;padding:14px;margin:12px 0}
+.science h4{margin:0 0 6px}
+.bullets{padding-left:20px}
+.bullets li{margin-bottom:8px}
+.fuq{min-width:0}
+[hidden]{display:none!important}
+@media (max-width:520px){
+  .lbl{min-width:100%;padding-top:0}
+  .dot{width:40px;height:40px}
+  .mission{padding:16px}
+  .mission h2{font-size:24px}
+  .cross{grid-template-columns:1fr auto 1fr;gap:6px}
+  .tile{padding:10px 8px}
+  .tile b.sym{font-size:20px}
+  .slot{min-width:48px;font-size:20px;padding:0 8px}
+  .x{padding:0;line-height:1.2;font-size:22px}
+  .ans{min-width:0;width:100%}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="brand">Ion Name Lab<small>Criss-cross the charges, then write the formula and the name</small></div>
+  <nav id="dots" aria-label="Missions"></nav>
+</header>
+
+<main class="wrap">
+  <div id="stage"></div>
+</main>
+
+<script>
+/* ---------- Ion data ---------- */
+const IONS = {
+  cations: {
+    Na:{name:'sodium',sym:'Na',q:1,poly:false},
+    K:{name:'potassium',sym:'K',q:1,poly:false},
+    Ca:{name:'calcium',sym:'Ca',q:2,poly:false},
+    Al:{name:'aluminum',sym:'Al',q:3,poly:false},
+    NH4:{name:'ammonium',sym:'NH₄',q:1,poly:true}
+  },
+  anions: {
+    Cl:{name:'chloride',sym:'Cl',q:-1,poly:false,o:0},
+    OH:{name:'hydroxide',sym:'OH',q:-1,poly:true,o:1},
+    NO3:{name:'nitrate',sym:'NO₃',q:-1,poly:true,o:3},
+    NO2:{name:'nitrite',sym:'NO₂',q:-1,poly:true,o:2},
+    SO4:{name:'sulfate',sym:'SO₄',q:-2,poly:true,o:4},
+    SO3:{name:'sulfite',sym:'SO₃',q:-2,poly:true,o:3},
+    CO3:{name:'carbonate',sym:'CO₃',q:-2,poly:true,o:3},
+    PO4:{name:'phosphate',sym:'PO₄',q:-3,poly:true,o:4}
+  }
+};
+const SUP={'1':'¹','2':'²','3':'³','4':'⁴'};
+const SUBD='₀₁₂₃₄₅₆₇₈₉';
+function chg(q){const a=Math.abs(q);return (a>1?SUP[a]:'')+(q>0?'⁺':'⁻');}
+function subN(n){return n>1?String(n).split('').map(d=>SUBD[+d]).join(''):'';}
+function part(ion,n){
+  if(!n) return '';
+  if(ion.poly && n>1) return '('+ion.sym+')'+subN(n);
+  return ion.sym+subN(n);
+}
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function plainSub(s){return s.replace(/[₀-₉]/g,d=>String(SUBD.indexOf(d)));}
+
+/* ---------- Answers (the correct formula and name, always simplified) ---------- */
+function expectedCounts(c,a){
+  const g=gcd(Math.abs(a.q),Math.abs(c.q));
+  return {cn:Math.abs(a.q)/g, an:Math.abs(c.q)/g};
+}
+function expectedFormulaPlain(c,a){
+  const k=expectedCounts(c,a);
+  const p=(ion,n)=>{ if(!n) return ''; const sp=plainSub(ion.sym); return (ion.poly&&n>1)?'('+sp+')'+n:sp+(n>1?n:''); };
+  return p(c,k.cn)+p(a,k.an);
+}
+function expectedFormulaDisplay(c,a){
+  const k=expectedCounts(c,a);
+  return part(c,k.cn)+part(a,k.an);
+}
+function expectedName(c,a){return c.name+' '+a.name;}
+function normFormula(s){
+  return s.replace(/\s+/g,'').replace(/\[/g,'(').replace(/\]/g,')').replace(/[₀-₉]/g,d=>String(SUBD.indexOf(d))).toLowerCase();
+}
+function normName(s){return s.trim().toLowerCase().replace(/\s+/g,' ');}
+
+/* ---------- Lab state helpers ---------- */
+let S=null, currentLab=null, tickedCount=0;
+function cat(s){return s.cation?IONS.cations[s.cation]:null;}
+function an(s){return s.anion?IONS.anions[s.anion]:null;}
+// slotC: the subscript written on the POSITIVE ion (it came from the negative ion's charge).
+// slotA: the subscript written on the NEGATIVE ion (it came from the positive ion's charge).
+function crossed(s){return s.slotC!==null && s.slotA!==null;}
+function counts(s){
+  if(!crossed(s)) return {cn:0,an:0};
+  let cn=s.slotC, an_=s.slotA;
+  if(s.reduced){const g=gcd(cn,an_); cn/=g; an_/=g;}
+  return {cn:cn, an:an_};
+}
+function formulaOf(s){
+  const c=cat(s), a=an(s);
+  if(!c||!a||!crossed(s)) return '—';
+  const k=counts(s);
+  return part(c,k.cn)+part(a,k.an);
+}
+function nameOf(s){
+  const c=cat(s), a=an(s);
+  if(!c||!a||!crossed(s)) return '—';
+  return expectedName(c,a);
+}
+function freshState(){
+  return {cation:null, anion:null, slotC:null, slotA:null, reduced:false,
+          formulaOK:false, nameOK:false, fMsg:'', fCls:'', nMsg:'', nCls:'',
+          seen:[], sel:null, msg:''};
+}
+function clearInputs(){
+  ['inF','inN'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+}
+function resetDerived(){
+  S.slotC=null; S.slotA=null; S.reduced=false;
+  S.formulaOK=false; S.nameOK=false; S.fMsg=''; S.fCls=''; S.nMsg=''; S.nCls='';
+  S.sel=null; S.msg=''; clearInputs();
+}
+
+/* ---------- Missions (data only) ---------- */
+const MISSIONS = [
+  {
+    title:'Ion Team Recruitment',
+    intro:'Ionic compounds follow a recipe, and today’s recipe is the criss-cross. Drag each charge number across to the other ion, then write the formula and the name yourself.',
+    predict:{
+      q:'One sodium ion (Na⁺) and one sulfate ion (SO₄²⁻) are about to team up. How many sodium ions does one sulfate ion need?',
+      options:['1','2','3'],
+      correct:1,
+      result:s=>`the formula is ${formulaOf(s)}`
+    },
+    lab:{
+      cations:['Na','K'], anions:['SO4','Cl'],
+      steps:[
+        {text:'Choose sodium (Na⁺).', check:s=>s.cation==='Na'},
+        {text:'Choose sulfate (SO₄²⁻).', check:s=>s.anion==='SO4'},
+        {text:'Drag each charge number onto the OTHER ion’s subscript slot.', check:s=>crossed(s)},
+        {text:'Look at the two subscripts. Which charge became which subscript?', manual:true},
+        {text:'Write the formula in the box below and press Check.', check:s=>s.formulaOK},
+        {text:'Write the name of the compound and press Check.', check:s=>s.nameOK}
+      ]
+    },
+    follow:[
+      {q:'Which formula did the criss-cross give?', options:['NaSO₄','Na₂SO₄','Na₂S'], correct:1,
+       hint:'The 2 from sulfate crossed over to become the subscript on sodium. The sulfate subscript of 1 is not written.'},
+      {q:'Why does sodium get the subscript 2?', options:['The sulfate charge (2) crossed over to become sodium’s subscript','Sodium has a charge of 2','Sulfate always comes in pairs'], correct:0,
+       hint:'Look at which charge you dragged to which ion in the lab.'}
+    ],
+    science:'Criss-cross: write each ion’s charge number, without its sign, as the subscript on the other ion. Na⁺ and SO₄²⁻ give Na₂SO₄. The name is sodium sulfate: positive ion first, and the polyatomic name stays as it is.'
+  },
+  {
+    title:'The Name Machine',
+    intro:'A pharmacy label in Al Ain says “calcium nitrate”. Cross the charges, write the formula, then write the name and see what happens to the nitrate part.',
+    predict:{
+      q:'The nitrate ion (NO₃⁻) joins calcium. What happens to the word “nitrate” in the compound’s name?',
+      options:['It changes to “nitrogen oxide”','It stays “nitrate”','It turns into “nitride”'],
+      correct:1,
+      result:s=>`the name is “${nameOf(s)}”. Nitrate kept its name`
+    },
+    lab:{
+      cations:['Na','Ca'], anions:['Cl','NO3'],
+      steps:[
+        {text:'Choose calcium (Ca²⁺).', check:s=>s.cation==='Ca'},
+        {text:'Choose nitrate (NO₃⁻).', check:s=>s.anion==='NO3'},
+        {text:'Drag each charge number onto the OTHER ion’s subscript slot.', check:s=>crossed(s)},
+        {text:'Look at the brackets the criss-cross needs. Which ion is used twice?', manual:true},
+        {text:'Write the formula in the box below and press Check.', check:s=>s.formulaOK},
+        {text:'Write the name of the compound and press Check.', check:s=>s.nameOK}
+      ]
+    },
+    follow:[
+      {q:'What is the name of K₂CO₃?', options:['potassium carbide','potassium carbonate','potassium carbonite'], correct:1,
+       hint:'Carbonate (CO₃²⁻) is a polyatomic ion. Its name stays the same, ending in -ate.'},
+      {q:'What is the name of Mg(OH)₂?', options:['magnesium dihydroxide','magnesium hydroxide','magnesium oxyhydride'], correct:1,
+       hint:'Hydroxide is a polyatomic ion with its own name. Ionic names do not use number prefixes like di-.'}
+    ],
+    science:'A polyatomic ion is a charged group of atoms that moves through reactions as one unit. Name the positive ion first, then the negative ion, and keep the polyatomic name exactly as it is.'
+  },
+  {
+    title:'Ate or Ite?',
+    intro:'Sulfite and sulfate look like twins. Spot the difference by counting the oxygen atoms.',
+    predict:{
+      q:'Sulfite (SO₃²⁻) and sulfate (SO₄²⁻) are close cousins. Which one has more oxygen atoms?',
+      options:['Sulfite','Sulfate','They have the same number'],
+      correct:1,
+      result:s=>'sulfite has 3 oxygen atoms and sulfate has 4'
+    },
+    lab:{
+      cations:[], anions:['SO3','SO4','NO2','NO3'], oxygen:true,
+      steps:[
+        {text:'Tap sulfite (SO₃²⁻) to look at it.', check:s=>s.seen.includes('SO3')},
+        {text:'Tap sulfate (SO₄²⁻) to look at it.', check:s=>s.seen.includes('SO4')},
+        {text:'Compare the oxygen counts in the card.', manual:true}
+      ]
+    },
+    follow:[
+      {q:'Nitrite (NO₂⁻) or nitrate (NO₃⁻): which one has one fewer oxygen atom?', options:['Nitrate','Nitrite'], correct:1,
+       hint:'Look at the -ite ending. Which formula has fewer O atoms in the lab card?'},
+      {q:'Which rule matches what you saw?', options:['The -ite ion has one fewer oxygen than the -ate ion','The -ite ion has one more oxygen than the -ate ion','-ite and -ate ions always have the same oxygen'], correct:0,
+       hint:'Compare sulfite (3 O) with sulfate (4 O) from the lab.'}
+    ],
+    science:'For the same central atom, the -ate ion has one more oxygen than the -ite ion. Sulfate (SO₄²⁻) has 4 oxygen atoms and sulfite (SO₃²⁻) has 3. Nitrate has 3 and nitrite has 2.'
+  },
+  {
+    title:'Ammonium Rescue',
+    intro:'A positive polyatomic ion made of nonmetal atoms wants to join the team. Its name sounds like a fertilizer.',
+    predict:{
+      q:'Ammonium (NH₄⁺) is a polyatomic ion. What kind of ion is it?',
+      options:['An anion (negative ion)','A cation (positive ion)','A neutral group with no charge'],
+      correct:1,
+      result:s=>`${formulaOf(s)} is “${nameOf(s)}”`
+    },
+    lab:{
+      cations:['Na','NH4'], anions:['NO3','Cl'],
+      steps:[
+        {text:'Choose ammonium (NH₄⁺).', check:s=>s.cation==='NH4'},
+        {text:'Choose chloride (Cl⁻).', check:s=>s.anion==='Cl'},
+        {text:'Drag each charge number onto the OTHER ion’s subscript slot.', check:s=>crossed(s)},
+        {text:'Look at both charges. What do you notice about the subscripts?', manual:true},
+        {text:'Write the formula in the box below and press Check.', check:s=>s.formulaOK},
+        {text:'Write the name of the compound and press Check.', check:s=>s.nameOK}
+      ]
+    },
+    follow:[
+      {q:'What is the name of NH₄Cl?', options:['ammonium chloride','ammonium chlorite','nitrogen chloride'], correct:0,
+       hint:'NH₄⁺ is the ammonium ion. Chloride keeps its name.'},
+      {q:'Why does NH₄Cl need no subscripts?', options:['Both charges are 1, so each ion is needed only once','Ammonium is not a real ion','Chloride is also a polyatomic ion'], correct:0,
+       hint:'Both charge numbers are 1. A subscript of 1 is not written.'}
+    ],
+    science:'Ammonium is the main positive polyatomic ion to know. Name it like any other cation: ammonium chloride, NH₄Cl. When both charges are 1, the criss-cross gives no subscripts.'
+  },
+  {
+    title:'Brackets Bouncer',
+    intro:'One calcium ion needs how many nitrate ions? Drag the charges across, then write the formula. The brackets are the clue.',
+    predict:{
+      q:'How many nitrate ions (NO₃⁻) does one calcium ion (Ca²⁺) need?',
+      options:['1','2','3'],
+      correct:1,
+      result:s=>`the formula is ${formulaOf(s)}`
+    },
+    lab:{
+      cations:['Ca','Al'], anions:['NO3','Cl'],
+      steps:[
+        {text:'Choose calcium (Ca²⁺).', check:s=>s.cation==='Ca'},
+        {text:'Choose nitrate (NO₃⁻).', check:s=>s.anion==='NO3'},
+        {text:'Drag each charge number onto the OTHER ion’s subscript slot.', check:s=>crossed(s)},
+        {text:'The 2 sits outside the nitrate. What does that subscript apply to?', manual:true},
+        {text:'Write the formula in the box below and press Check.', check:s=>s.formulaOK},
+        {text:'Write the name of the compound and press Check.', check:s=>s.nameOK}
+      ]
+    },
+    follow:[
+      {q:'Why are the brackets used in Ca(NO₃)₂?', options:['The subscript 2 applies to the whole nitrate group','It shows nitrate is a gas','Brackets are only decoration'], correct:0,
+       hint:'The subscript outside the brackets multiplies everything inside them.'},
+      {q:'What is the name of Ca(NO₃)₂?', options:['calcium dinitrate','calcium nitrate','calcium nitrogen oxide'], correct:1,
+       hint:'Use the names only, with no number prefixes like di-.'}
+    ],
+    science:'Criss-cross: the 2 from calcium becomes the subscript on nitrate, and the 1 from nitrate is left unwritten. Because the nitrate group is needed twice, it goes in brackets: Ca(NO₃)₂.'
+  },
+  {
+    title:'Mystery Scale',
+    intro:'A white crust has formed inside a kettle that gets its water from a rooftop tank. Lab tests found calcium and carbonate. Can you crack the formula and name?',
+    predict:{
+      q:'The scale is made of calcium (Ca²⁺) and carbonate (CO₃²⁻). Which ratio of ions is in the scale?',
+      options:['1 Ca²⁺ : 1 CO₃²⁻','2 Ca²⁺ : 1 CO₃²⁻','1 Ca²⁺ : 2 CO₃²⁻'],
+      correct:0,
+      result:s=>`the formula is ${formulaOf(s)}`
+    },
+    lab:{
+      cations:['Na','Ca'], anions:['Cl','CO3'],
+      steps:[
+        {text:'Choose calcium (Ca²⁺).', check:s=>s.cation==='Ca'},
+        {text:'Choose carbonate (CO₃²⁻).', check:s=>s.anion==='CO3'},
+        {text:'Drag each charge number across. Look at the two 2s.', check:s=>crossed(s)},
+        {text:'Press ÷ Simplify. Do both numbers share a factor?', check:s=>s.reduced},
+        {text:'Write the formula in the box below and press Check.', check:s=>s.formulaOK},
+        {text:'Write the name of the compound and press Check.', check:s=>s.nameOK}
+      ]
+    },
+    follow:[
+      {q:'What is the name of the scale?', options:['calcium carbonate','calcium carbide','calcium oxide'], correct:0,
+       hint:'Carbonate is the polyatomic ion CO₃²⁻. Its name ends in -ate.'},
+      {q:'Why does the simplified formula have no subscripts at all?', options:['Both 2s share a factor of 2, so each becomes 1','Carbonate has no charge','Calcium always pairs one-to-one'], correct:0,
+       hint:'Divide both 2s by 2. What number is left?'}
+    ],
+    science:'Criss-cross gives Ca₂(CO₃)₂. Both numbers are 2, which share a factor of 2, so divide both by 2 to get CaCO₃. Calcium carbonate is the white scale that forms in kettles and water tanks.'
+  }
+];
+
+const KEY='ion-name-lab-v3';
+function loadDone(){try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return [];}}
+function saveDone(a){try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){}}
+let done=loadDone();
+let current=0, predicted=null, selPred=null;
+let fuStep=0, fuMsg='', fuHint='';
+const stage=document.getElementById('stage');
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function firstIncomplete(){const i=MISSIONS.findIndex((_,k)=>!done.includes(k));return i===-1?MISSIONS.length:i;}
+function accessible(i){return i===0||done.includes(i-1)||done.includes(i);}
+function markDone(i){if(!done.includes(i)){done.push(i);saveDone(done);}}
+
+function dots(){
+  document.getElementById('dots').innerHTML=MISSIONS.map((m,i)=>{
+    const cls=done.includes(i)?'done':i===current?'cur':(accessible(i)?'open':'lock');
+    return `<button class="dot ${cls}" data-act="goto" data-v="${i}" aria-label="Mission ${i+1}: ${m.title}" ${accessible(i)?'':'disabled'}>${i+1}</button>`;
+  }).join('');
+}
+
+/* ---------- Rendering ---------- */
+function renderMission(i){
+  current=i;
+  const m=MISSIONS[i];
+  currentLab=m.lab;
+  S=freshState();
+  tickedCount=0; predicted=null; selPred=null;
+  fuStep=0; fuMsg=''; fuHint='';
+  stage.innerHTML=`
+  <article class="mission">
+    <p class="kicker">Mission ${i+1} of ${MISSIONS.length}</p>
+    <h2>${m.title}</h2>
+    <p class="intro">${m.intro}</p>
+
+    <section class="step">
+      <h3><span class="num">1</span>Predict</h3>
+      <p class="q">${m.predict.q}</p>
+      <div class="opts">${m.predict.options.map((o,k)=>`<button class="opt" data-act="predict" data-v="${k}">${o}</button>`).join('')}</div>
+      <button id="lockbtn" class="btn primary" data-act="lock" disabled>Lock in my prediction 🔒</button>
+      <p id="lockmsg" class="note" hidden>Locked in. You cannot change it now. Time to test it!</p>
+    </section>
+
+    <section class="step">
+      <h3><span class="num">2</span>Test it in the lab</h3>
+      <div id="lab-locked" class="locked">🔒 The lab is locked. Lock in your prediction to open it.</div>
+      <div id="lab-wrap" hidden><div id="bench"></div></div>
+    </section>
+
+    <section class="step">
+      <h3><span class="num">3</span>Follow-up</h3>
+      <div id="fu-locked" class="locked">Finish every lab step to unlock the questions.</div>
+      <div id="fu" hidden></div>
+    </section>
+  </article>`;
+  dots();
+  window.scrollTo(0,0);
+}
+
+function renderSummary(){
+  current=-1;
+  currentLab={cations:Object.keys(IONS.cations),anions:Object.keys(IONS.anions),steps:[]};
+  S=freshState(); tickedCount=0;
+  stage.innerHTML=`
+  <article class="mission">
+    <p class="kicker">All six missions done</p>
+    <h2>What you found out</h2>
+    <ul class="bullets">
+      <li>Polyatomic ions are charged groups of atoms. In a compound they keep their own names.</li>
+      <li>Name the positive ion first, then the negative ion. No number prefixes are used.</li>
+      <li>Criss-cross: move each charge number (without its sign) onto the other ion as a subscript.</li>
+      <li>Simplify when both numbers share a factor, as in Ca₂(CO₃)₂ becoming CaCO₃.</li>
+      <li>When a polyatomic ion is needed more than once, put it in brackets: Ca(NO₃)₂.</li>
+      <li>For the same central atom, the -ate ion has one more oxygen than the -ite ion.</li>
+    </ul>
+    <p class="note">📘 Check your notes under <b>Naming ionic compounds with polyatomic ions</b> and match each mission to its section.</p>
+    <div class="step">
+      <h3>Free exploration</h3>
+      <p class="intro">The lab is open. Pick any two ions, criss-cross them, and write the formula and name.</p>
+      <div id="bench"></div>
+    </div>
+  </article>`;
+  dots();
+  mountBench();
+  window.scrollTo(0,0);
+}
+
+function chipHTML(k,act,isCat){
+  const ion=isCat?IONS.cations[k]:IONS.anions[k];
+  return `<button class="chip" data-act="${act}" data-v="${k}" aria-pressed="false">${ion.name} <b>${ion.sym}${chg(ion.q)}</b></button>`;
+}
+
+function mountBench(){
+  const lab=currentLab;
+  const bench=document.getElementById('bench');
+  if(!bench) return;
+  const showC=lab.cations.length>0;
+  bench.innerHTML=`
+    <div class="banner" id="banner"></div>
+    ${showC?`<div class="row"><span class="lbl">Positive ion (+)</span><div class="chips">${lab.cations.map(k=>chipHTML(k,'pick-c',true)).join('')}</div></div>`:''}
+    <div class="row"><span class="lbl">Negative ion (−)</span><div class="chips">${lab.anions.map(k=>chipHTML(k,'pick-a',false)).join('')}</div></div>
+    ${lab.oxygen?'<div class="ioncard" id="ioncard"></div>':`
+      <div class="cross" id="cross"></div>
+      <div class="btnrow">
+        <button class="btn ghost" data-act="simplify" id="btn-simplify">÷ Simplify</button>
+      </div>
+      <div class="turn">
+        <h4>✍️ Your turn</h4>
+        <div class="trow">
+          <label for="inF">Formula</label>
+          <input id="inF" class="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="for example Na2SO4" data-ans="f">
+          <button class="btn primary" data-act="check-f">Check</button>
+        </div>
+        <p class="fb" id="fbF"></p>
+        <div class="trow">
+          <label for="inN">Name</label>
+          <input id="inN" class="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="for example sodium sulfate" data-ans="n">
+          <button class="btn primary" data-act="check-n">Check</button>
+        </div>
+        <p class="fb" id="fbN"></p>
+        <p class="note">Type the formula with normal numbers, for example Ca(NO3)2. Subscripts are optional.</p>
+      </div>`}
+    <canvas id="cv" class="cv" ${lab.oxygen?'hidden':''}></canvas>
+    <ol class="steplist" id="steplist"></ol>`;
+  if(!reduce) startLoop();
+  updateLab();
+}
+
+/* Tiles: each ion shows its charge as a draggable chip and a dashed slot for the subscript it receives. */
+function crossPanelHTML(s){
+  const c=cat(s), a=an(s);
+  if(!c||!a) return '<p class="crosslog">Pick a positive ion and a negative ion to start.</p>';
+  const slotC=s.slotC!==null, slotA=s.slotA!==null;
+  const slotCls=(filled,target)=>`slot${filled?' filled':''}${target?' target':''}`;
+  const tileC=`
+    <div class="tile">
+      <span class="tn">${c.name}</span>
+      <b class="sym">${c.sym}${chg(c.q)}</b>
+      <div class="slotwrap"><span class="sl">subscript on ${c.sym}:</span>
+        <button type="button" class="${slotCls(slotC, s.sel==='a' && !slotC)}" data-act="slot" data-v="c" data-slot="c" aria-label="Subscript slot on ${c.name}">${slotC?s.slotC:'?'}</button>
+      </div>
+      <button type="button" class="chip-drag${s.sel==='c'?' on':''}${slotA?' used':''}" data-chip="c" data-act="pick-chip" data-v="c">charge ${Math.abs(c.q)}</button>
+    </div>`;
+  const tileA=`
+    <div class="tile">
+      <span class="tn">${a.name}</span>
+      <b class="sym">${a.sym}${chg(a.q)}</b>
+      <div class="slotwrap"><span class="sl">subscript on ${a.sym}:</span>
+        <button type="button" class="${slotCls(slotA, s.sel==='c' && !slotA)}" data-act="slot" data-v="a" data-slot="a" aria-label="Subscript slot on ${a.name}">${slotA?s.slotA:'?'}</button>
+      </div>
+      <button type="button" class="chip-drag${s.sel==='a'?' on':''}${slotC?' used':''}" data-chip="a" data-act="pick-chip" data-v="a">charge ${Math.abs(a.q)}</button>
+    </div>`;
+  let text;
+  if(s.msg) text=s.msg;
+  else if(crossed(s)) text='Both subscripts are in place. Press ÷ Simplify if both numbers share a factor, then write the formula below.';
+  else text='Drag each charge number onto the OTHER ion’s slot. Or tap a charge, then tap a slot.';
+  const bad = /^(Careful|That slot|Drop)/.test(s.msg||'');
+  return tileC+`<div class="x">✕</div>`+tileA+`<p class="crosslog${bad?' bad':''}">${text}</p>`;
+}
+
+function updateLab(){
+  const bench=document.getElementById('bench');
+  if(!bench||!currentLab) return;
+  const steps=currentLab.steps||[];
+  while(tickedCount<steps.length && !steps[tickedCount].manual && steps[tickedCount].check(S)) tickedCount++;
+
+  const banner=document.getElementById('banner');
+  if(steps.length===0){
+    banner.textContent='Free exploration: pick any two ions and practise writing formulas and names.';
+  } else if(tickedCount<steps.length){
+    const cur=steps[tickedCount];
+    banner.innerHTML=`<div>Step ${tickedCount+1} of ${steps.length}: ${cur.text}</div>`+
+      (cur.manual?`<button class="btn" data-act="manual">I have done this ✓</button>`:'');
+  } else {
+    banner.textContent='All steps ticked! The follow-up questions are open below ↓';
+  }
+
+  bench.querySelectorAll('[data-act=pick-c]').forEach(b=>{const on=b.dataset.v===S.cation;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});
+  bench.querySelectorAll('[data-act=pick-a]').forEach(b=>{const on=b.dataset.v===S.anion;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});
+
+  if(currentLab.oxygen){
+    const a=an(S);
+    document.getElementById('ioncard').innerHTML = a
+      ? `<b>${a.name}</b> ${a.sym}${chg(a.q)}<br>Oxygen atoms: <span class="big">${a.o}</span>`
+      : 'Tap an ion to look at it.';
+  } else {
+    document.getElementById('cross').innerHTML = crossPanelHTML(S);
+    document.getElementById('btn-simplify').disabled = !crossed(S) || S.reduced;
+    const fb=document.getElementById('fbF'), nb=document.getElementById('fbN');
+    fb.textContent=S.fMsg; fb.className='fb '+(S.fCls||'');
+    nb.textContent=S.nMsg; nb.className='fb '+(S.nCls||'');
+  }
+
+  document.getElementById('steplist').innerHTML = steps.map((st,i)=>{
+    const d=i<tickedCount, cur=i===tickedCount;
+    return `<li class="${d?'tick':cur?'now':''}"><span class="box">${d?'✓':i+1}</span><span class="st">${st.text}</span></li>`;
+  }).join('');
+
+  drawBench();
+
+  if(steps.length && tickedCount===steps.length) unlockFU();
+}
+
+/* Drop rules: a charge number goes to the OTHER ion's slot; a filled slot must be cleared first. */
+function drop(from,to){
+  if(from===to){
+    S.msg='Careful! Each charge crosses over to the OTHER ion.';
+  } else if((to==='c' && S.slotC!==null) || (to==='a' && S.slotA!==null)){
+    S.msg='That slot is already full. Tap it to clear it first.';
+  } else {
+    const src = from==='c' ? cat(S) : an(S);
+    const val = Math.abs(src.q);
+    if(to==='c') S.slotC=val; else S.slotA=val;
+    S.reduced=false;
+    S.msg = `${val} crossed over ✓`;
+  }
+  S.sel=null;
+  updateLab();
+}
+function clearSlot(which){
+  if(which==='c') S.slotC=null; else S.slotA=null;
+  S.reduced=false; S.formulaOK=false; S.nameOK=false;
+  S.fMsg=''; S.nMsg=''; S.msg='Slot cleared. Try again.';
+  updateLab();
+}
+
+/* Typed answers */
+function checkFormula(){
+  const c=cat(S), a=an(S);
+  const txt=document.getElementById('inF').value;
+  if(!c||!a){S.fMsg='Pick both ions first.'; S.fCls='bad'; return updateLab();}
+  if(!crossed(S)){S.fMsg='Criss-cross the charges first, then write the formula.'; S.fCls='bad'; return updateLab();}
+  if(!txt.trim()){S.fMsg='Type a formula first.'; S.fCls='bad'; return updateLab();}
+  const want=normFormula(expectedFormulaPlain(c,a));
+  const got=normFormula(txt);
+  if(got===want){
+    S.formulaOK=true; S.fCls='good';
+    S.fMsg='✓ Correct! The formula is '+expectedFormulaDisplay(c,a)+'.';
+  } else {
+    S.formulaOK=false; S.fCls='bad';
+    const k=expectedCounts(c,a);
+    const unred=normFormula((function(){const p=(ion,n)=>{if(!n)return '';const sp=plainSub(ion.sym);return (ion.poly&&n>1)?'('+sp+')'+n:sp+(n>1?n:'');};return p(c,Math.abs(a.q))+p(a,Math.abs(c.q));})());
+    let hint;
+    if(got===unred && normFormula(expectedFormulaPlain(c,a))!==unred){
+      hint='Almost! You can simplify. Divide both numbers by their common factor.';
+    } else if(a.poly && k.cn>1 && !/[()\[\]]/.test(txt)){
+      hint='The nitrate or sulfate part is needed more than once, so put it in brackets with the subscript outside.';
+    } else if(c.poly && k.an>1 && !/[()\[\]]/.test(txt)){
+      hint='The ammonium part is needed more than once, so put it in brackets with the subscript outside.';
+    } else {
+      hint='Not quite. Each charge number becomes the subscript on the OTHER ion. Check which number goes where.';
+    }
+    S.fMsg='✗ '+hint;
+  }
+  updateLab();
+}
+function checkName(){
+  const c=cat(S), a=an(S);
+  const txt=document.getElementById('inN').value;
+  if(!c||!a){S.nMsg='Pick both ions first.'; S.nCls='bad'; return updateLab();}
+  if(!crossed(S)){S.nMsg='Criss-cross the charges first, then write the name.'; S.nCls='bad'; return updateLab();}
+  if(!txt.trim()){S.nMsg='Type a name first.'; S.nCls='bad'; return updateLab();}
+  if(normName(txt)===normName(expectedName(c,a))){
+    S.nameOK=true; S.nCls='good';
+    S.nMsg='✓ Correct! The name is '+expectedName(c,a)+'.';
+  } else {
+    S.nameOK=false; S.nCls='bad';
+    let hint;
+    if(/\b(di|tri|tetra|mono)/.test(normName(txt))) hint='Ionic names do not use number prefixes like di- or tri-.';
+    else if(/ide\b/.test(normName(txt)) && a.poly) hint='The negative ion is a polyatomic ion, so its name ends in -ate or -ite, not -ide.';
+    else hint='Say the positive ion first, then the negative ion. Keep polyatomic names as they are.';
+    S.nMsg='✗ '+hint;
+  }
+  updateLab();
+}
+
+function unlockFU(){
+  document.getElementById('fu-locked').hidden=true;
+  const fu=document.getElementById('fu');
+  if(fu.hidden){fu.hidden=false; renderFU();}
+}
+
+function renderFU(){
+  const m=MISSIONS[current];
+  const match=predicted===m.predict.correct;
+  let html=`<div class="compare">
+    <p>You predicted: <b>${m.predict.options[predicted]}</b></p>
+    <p>The lab showed: <b>${m.predict.result(S)}</b></p>
+    <p class="${match?'ok':'warn'}">${match?'✓ Your prediction matched the lab!':'✗ Not this time. A miss is where the best learning happens.'}</p>
+  </div>`;
+  if(fuStep<m.follow.length){
+    const q=m.follow[fuStep];
+    html+=`<div class="fuq">
+      <p class="kicker">Question ${fuStep+1} of ${m.follow.length}</p>
+      <p class="q">${q.q}</p>
+      <div class="opts">${q.options.map((o,k)=>`<button class="opt" data-act="fu" data-v="${k}">${o}</button>`).join('')}</div>
+      ${fuHint?`<p class="hint">💡 ${fuHint}</p>`:''}
+      ${fuMsg?`<p class="ok">${fuMsg}</p>`:''}
+    </div>`;
+  } else {
+    html+=`<div class="science"><h4>The science</h4><p>${m.science}</p></div>
+      <button class="btn primary" data-act="next">${current<MISSIONS.length-1?'Next mission →':'See what you found out →'}</button>`;
+  }
+  document.getElementById('fu').innerHTML=html;
+}
+
+function answerFU(k){
+  const m=MISSIONS[current];
+  const q=m.follow[fuStep];
+  if(k===q.correct){
+    fuStep++; fuHint='';
+    fuMsg = fuStep<m.follow.length ? '✓ Correct! Next question:' : '✓ Correct! Here is the science.';
+  } else {
+    fuHint=q.hint; fuMsg='';
+  }
+  renderFU();
+}
+
+/* ---------- Canvas: the ions the criss-cross produces ---------- */
+function drawBench(){
+  const cv=document.getElementById('cv');
+  if(!cv||!currentLab||currentLab.oxygen) return;
+  const dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth||320, h=cv.clientHeight||170;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const css=getComputedStyle(document.documentElement);
+  const line=css.getPropertyValue('--line').trim()||'#ccc';
+  const muted=css.getPropertyValue('--muted').trim()||'#666';
+  const c=cat(S), a=an(S), k=counts(S), items=[];
+  if(c) for(let i=0;i<k.cn;i++) items.push({sym:c.sym,q:c.q,col:'#2D6CA2'});
+  if(a) for(let i=0;i<k.an;i++) items.push({sym:a.sym,q:a.q,col:'#CC4B31'});
+  ctx.strokeStyle=line; ctx.lineWidth=2; ctx.strokeRect(1,1,w-2,h-2);
+  if(items.length===0){
+    ctx.fillStyle=muted; ctx.font='16px system-ui,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(crossed(S) ? 'Pick both ions to build the compound' : 'Drag the charges to build the compound', w/2, h/2);
+    return;
+  }
+  const n=items.length;
+  const cols=Math.min(8,Math.max(1,Math.ceil(Math.sqrt(n*1.8))));
+  const rows=Math.ceil(n/cols);
+  const cellW=w/cols, cellH=h/rows;
+  const r=Math.max(10,Math.min(22,cellW/2-6,cellH/2-6));
+  const t=performance.now()/1000;
+  items.forEach((it,i)=>{
+    const col=i%cols, row=Math.floor(i/cols);
+    const x=(col+0.5)*cellW;
+    const y=(row+0.5)*cellH + (reduce?0:Math.sin(t*2+i*0.9)*3);
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=it.col; ctx.fill();
+    ctx.fillStyle='#ffffff'; ctx.font=`700 ${Math.max(9,Math.round(r*0.6))}px system-ui,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(it.sym+chg(it.q),x,y);
+  });
+}
+let loopOn=false;
+function startLoop(){
+  if(loopOn) return;
+  loopOn=true;
+  const f=()=>{
+    const cv=document.getElementById('cv');
+    if(!cv){loopOn=false;return;}
+    drawBench();
+    requestAnimationFrame(f);
+  };
+  requestAnimationFrame(f);
+}
+
+/* ---------- Drag and drop (mouse, touch and pen via pointer events) ---------- */
+let drag=null;
+let suppressClick=false;
+stage.addEventListener('pointerdown', e=>{
+  suppressClick=false;
+  const chip=e.target.closest('[data-chip]');
+  if(!chip) return;
+  drag={from:chip.dataset.chip, label:chip.textContent.trim(), x:e.clientX, y:e.clientY, moved:false, ghost:null};
+  try{chip.setPointerCapture(e.pointerId);}catch(_){}
+});
+stage.addEventListener('pointermove', e=>{
+  if(!drag) return;
+  if(!drag.moved && Math.hypot(e.clientX-drag.x, e.clientY-drag.y) > 8){
+    drag.moved=true;
+    const g=document.createElement('div');
+    g.className='dragghost';
+    g.textContent=drag.label;
+    document.body.appendChild(g);
+    drag.ghost=g;
+  }
+  if(drag.moved && drag.ghost){
+    drag.ghost.style.left=e.clientX+'px';
+    drag.ghost.style.top=e.clientY+'px';
+    e.preventDefault();
+  }
+});
+function endDrag(e){
+  if(!drag) return;
+  const d=drag; drag=null;
+  document.querySelectorAll('.dragghost').forEach(g=>g.remove());
+  if(d.moved){
+    suppressClick=true;
+    const under=document.elementFromPoint(e.clientX,e.clientY);
+    const slot=under && under.closest('[data-slot]');
+    if(slot && S){
+      drop(d.from, slot.dataset.slot);
+    } else if(S){
+      S.msg='Drop the charge on the OTHER ion’s slot.';
+      updateLab();
+    }
+  }
+}
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', ()=>{ if(drag){ if(drag.ghost) drag.ghost.remove(); drag=null; } });
+
+/* ---------- Clicks / taps and Enter in the answer boxes (one delegated listener) ---------- */
+document.addEventListener('click', e=>{
+  if(suppressClick){ suppressClick=false; return; } // a drag just ended; ignore its trailing click
+  const b=e.target.closest('[data-act]');
+  if(!b||b.disabled) return;
+  const a=b.dataset.act, v=b.dataset.v;
+  if(a==='predict'){
+    if(predicted!==null) return;
+    selPred=+v;
+    stage.querySelectorAll('[data-act=predict]').forEach(x=>x.classList.toggle('sel',x===b));
+    document.getElementById('lockbtn').disabled=false;
+  }
+  else if(a==='lock'){
+    if(selPred===null||predicted!==null) return;
+    predicted=selPred;
+    stage.querySelectorAll('[data-act=predict]').forEach(x=>{x.disabled=true;});
+    document.getElementById('lockbtn').hidden=true;
+    document.getElementById('lockmsg').hidden=false;
+    document.getElementById('lab-locked').hidden=true;
+    document.getElementById('lab-wrap').hidden=false;
+    mountBench();
+  }
+  else if(a==='pick-c'){S.cation=v; resetDerived(); updateLab();}
+  else if(a==='pick-a'){S.anion=v; if(!S.seen.includes(v)) S.seen.push(v); resetDerived(); updateLab();}
+  else if(a==='pick-chip'){
+    if(S.sel===v) S.sel=null; else S.sel=v;
+    S.msg=''; updateLab();
+  }
+  else if(a==='slot'){
+    const filled = v==='c' ? S.slotC!==null : S.slotA!==null;
+    if(filled) clearSlot(v);
+    else if(S.sel) drop(S.sel, v);
+    else { S.msg='Tap a charge first, then tap a slot. Or drag it across.'; updateLab(); }
+  }
+  else if(a==='simplify'){if(crossed(S)){S.reduced=true; S.fMsg=''; S.nMsg='';} updateLab();}
+  else if(a==='check-f'){checkFormula();}
+  else if(a==='check-n'){checkName();}
+  else if(a==='manual'){
+    const steps=currentLab.steps;
+    if(tickedCount<steps.length && steps[tickedCount].manual) tickedCount++;
+    updateLab();
+  }
+  else if(a==='fu'){answerFU(+v);}
+  else if(a==='next'){
+    markDone(current);
+    if(current<MISSIONS.length-1) renderMission(current+1); else renderSummary();
+  }
+  else if(a==='goto'){
+    const i=+v;
+    if(i!==current && accessible(i)) renderMission(i);
+  }
+});
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Enter') return;
+  if(e.target.id==='inF'){e.preventDefault(); checkFormula();}
+  else if(e.target.id==='inN'){e.preventDefault(); checkName();}
+});
+
+/* ---------- Start ---------- */
+if(firstIncomplete()===MISSIONS.length) renderSummary();
+else renderMission(firstIncomplete());
+</script>
+
+</body></html>

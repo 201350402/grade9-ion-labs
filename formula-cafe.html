@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Formula Café</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;700&family=Poppins:wght@600;700&display=swap">
+<style>
+/* Layout: café menu home (courses as cards) → one guided practice column per course; toolkit always one tap away. */
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#16233a; --head:#1E3A5F; --muted:#55627a; --line:#d6dde9;
+  --navy:#1E3A5F; --gold:#A97F0F; --bad:#CC4B31; --cool:#2D6CA2; --ok:#2e7d4f;
+  --tint:#e9eef6; --tint-gold:#fbf5e6; --on-navy:#ffffff;
+  --f-head:Poppins,"Segoe UI",system-ui,sans-serif; --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif; --f-num:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b2d; --card:#172840; --text:#e8eef8; --head:#cfe0f5; --muted:#a9b6cc; --line:#2c4262;
+  --navy:#2d4f7a; --gold:#d9a93a; --bad:#e0705a; --cool:#5a9ad6; --ok:#5fbf86;
+  --tint:#1d3352; --tint-gold:#2b2412; --on-navy:#ffffff; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1b2d; --card:#172840; --text:#e8eef8; --head:#cfe0f5; --muted:#a9b6cc; --line:#2c4262;
+  --navy:#2d4f7a; --gold:#d9a93a; --bad:#e0705a; --cool:#5a9ad6; --ok:#5fbf86;
+  --tint:#1d3352; --tint-gold:#2b2412; --on-navy:#ffffff; color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:17px;line-height:1.5}
+h1,h2,h3,h4{font-family:var(--f-head);color:var(--head);line-height:1.2;margin:0;text-wrap:balance}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 48px}
+header.top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{font-family:var(--f-head);font-weight:700;font-size:22px;color:var(--head)}
+.brand small{display:block;font-family:var(--f-body);font-weight:400;font-size:14px;color:var(--muted)}
+.topbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stars{font-family:var(--f-num);font-weight:700;color:var(--gold);background:var(--tint-gold);border:1.5px solid var(--gold);border-radius:999px;padding:8px 14px;font-size:15px;white-space:nowrap}
+.btn{min-height:48px;padding:10px 18px;border-radius:12px;border:0;font:700 16px var(--f-head);cursor:pointer;background:var(--tint);color:var(--text)}
+.btn.primary{background:var(--navy);color:var(--on-navy)}
+.btn.ghost{background:transparent;border:2px solid var(--navy);color:var(--text)}
+.btn.small{min-height:40px;padding:6px 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid var(--cool);outline-offset:2px}
+
+/* Menu */
+.plate{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.plate p{margin:0}
+.bar{flex:1 1 220px;height:12px;border-radius:999px;background:var(--tint);overflow:hidden;min-width:0}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:999px;transition:width .4s}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.course{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.course.starter{border:2px solid var(--navy)}
+.course .tag{justify-self:start;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.course h3{font-size:20px}
+.course p{margin:0;color:var(--muted)}
+.course .meta{font-family:var(--f-num);font-size:14px;color:var(--text)}
+.course .btn{justify-self:start;margin-top:4px}
+.done-badge{color:var(--ok);font-weight:700}
+.howto{background:var(--tint);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.howto ol{margin:6px 0 0;padding-left:22px}
+.resetrow{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:15px}
+
+/* Course view */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;min-width:0}
+.crumbs{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.kicker{font-size:14px;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:0}
+.panel h2{font-size:26px;margin:2px 0 6px}
+.intro{color:var(--muted);margin:0 0 12px}
+#dots{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+.dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--text);font:700 14px var(--f-head);display:grid;place-items:center}
+.dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.cur{border-color:var(--gold);box-shadow:0 0 0 3px var(--tint-gold)}
+.task{border-top:1px dashed var(--line);padding-top:14px}
+.q{font-size:20px;font-weight:700;margin:0 0 10px}
+.big{font-family:var(--f-num);font-weight:700;font-size:30px}
+.opts{display:grid;gap:8px;margin:10px 0}
+.opt{min-height:48px;text-align:left;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:var(--tint);color:var(--text);font:inherit;font-size:17px;cursor:pointer}
+.opt.right{border-color:var(--ok);background:var(--card);box-shadow:inset 0 0 0 1px var(--ok)}
+.opt.wrong{border-color:var(--bad);opacity:.7}
+.opt:disabled{cursor:default}
+.fb{margin:10px 0 0;padding:10px 12px;border-radius:12px;font-weight:700}
+.fb.good{background:var(--tint);color:var(--ok)}
+.fb.bad{background:var(--tint-gold);color:var(--text);font-weight:400}
+.fb.bad b{color:var(--bad)}
+.banner{background:var(--navy);color:var(--on-navy);border-radius:12px;padding:12px 14px;font-weight:700;margin:4px 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--text);font:inherit;cursor:pointer}
+.chip b{font-family:var(--f-num);font-weight:500}
+.chip.on{background:var(--cool);border-color:var(--cool);color:#fff}
+.chip.no{border-color:var(--bad);opacity:.6}
+.lbl{font-size:14px;color:var(--muted);margin:10px 0 6px}
+.cross{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;margin:6px 0}
+.tile{background:var(--tint);border-radius:14px;padding:14px 10px;text-align:center;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tile .tn{font-size:14px;color:var(--muted)}
+.tile .sym{font-family:var(--f-num);font-weight:700;font-size:26px;overflow-wrap:anywhere}
+.x{align-self:center;font-size:26px;color:var(--gold);font-weight:700}
+.slot{min-width:58px;min-height:48px;padding:0 10px;border:2px dashed var(--muted);border-radius:12px;display:grid;place-items:center;font-family:var(--f-num);font-size:22px;background:var(--card);color:var(--muted)}
+.slot.filled{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.sl{font-size:13px;color:var(--muted)}
+.chg{min-height:48px;padding:8px 14px;border:0;border-radius:999px;background:var(--gold);color:#fff;font:700 16px var(--f-body);cursor:pointer}
+.chg.used{opacity:.45}
+.count{font-size:16px;margin:8px 0 0;color:var(--text)}
+.trow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.ans{flex:1 1 200px;min-width:0;min-height:48px;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:19px}
+.steplist{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:6px}
+.steplist li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:16px}
+.steplist li.now{border-color:var(--gold);background:var(--tint-gold)}
+.steplist .box{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;flex:none;font-weight:700;font-family:var(--f-head);font-size:14px}
+.steplist li.tick .box{background:var(--ok);border-color:var(--ok);color:#fff}
+/* reverse criss-cross formula */
+.rev{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+.part{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--tint);border-radius:14px;padding:12px 16px;min-width:120px}
+.bubble{min-width:64px;min-height:44px;border:2px dashed var(--muted);border-radius:999px;display:grid;place-items:center;font-family:var(--f-num);font-weight:700;font-size:20px;color:var(--muted);background:var(--card);padding:0 10px}
+.bubble.filled{border-style:solid;border-color:var(--cool);color:var(--cool)}
+.bubble.fixed{border-color:var(--ok);color:var(--ok)}
+.symrow{display:flex;align-items:flex-end;gap:2px}
+.symrow .sym{font-family:var(--f-num);font-weight:700;font-size:34px}
+.subchip{min-width:44px;min-height:44px;border:2px solid var(--gold);border-radius:10px;background:var(--tint-gold);color:var(--text);font:700 20px var(--f-num);cursor:pointer;margin-bottom:-6px}
+.subchip.ghost{border-style:dashed;color:var(--muted)}
+.subchip.used{opacity:.45}
+.pl{font-size:13px;color:var(--muted)}
+.checkcard{background:var(--tint-gold);border:1.5px dashed var(--gold);border-radius:12px;padding:12px 14px;margin:10px 0}
+.work{font-family:var(--f-num);font-size:22px;font-weight:700;background:var(--tint);border-radius:12px;padding:12px 14px;margin:6px 0 10px;overflow-wrap:anywhere}
+.finish{text-align:center;padding:10px 0}
+.finish .big{color:var(--gold)}
+/* toolkit */
+.tk{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tk section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.tk h3{font-size:18px;margin-bottom:8px}
+.tk table{width:100%;border-collapse:collapse;font-size:16px}
+.tk td{padding:5px 6px;border-bottom:1px solid var(--line)}
+.tk td.f{font-family:var(--f-num);font-weight:700;white-space:nowrap}
+.tk ol{margin:0;padding-left:20px}
+.tk li{margin-bottom:6px}
+.ar{direction:rtl;text-align:right;color:var(--muted)}
+@media (max-width:520px){
+  .panel{padding:16px}
+  .panel h2{font-size:22px}
+  .cross{gap:6px}
+  .tile .sym{font-size:21px}
+  .symrow .sym{font-size:28px}
+  .part{min-width:0;padding:10px}
+  .q{font-size:18px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Formula Café<small>Practise formulas and names: polyatomic ions and transition metals</small></div>
+    <div class="topbtns">
+      <span class="stars" id="starTotal">★ 0</span>
+      <button class="btn small ghost" data-act="menu" id="btnMenu">Menu</button>
+      <button class="btn small ghost" data-act="toolkit" id="btnTk">Toolkit</button>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+
+<script>
+/* ===== helpers ===== */
+const SUBD='₀₁₂₃₄₅₆₇₈₉', SUPD={2:'²',3:'³',4:'⁴'}, ROMAN=['','I','II','III','IV'];
+const sub=n=>n>1?String(n).split('').map(d=>SUBD[+d]).join(''):'';
+const chgTxt=(q,neg)=>(q>1?SUPD[q]:'')+(neg?'⁻':'⁺');
+const chgPlain=(q,neg)=>q+(neg?'−':'+');
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ===== ions ===== */
+const CAT={
+  K:{name:'potassium',sym:'K',q:1}, Na:{name:'sodium',sym:'Na',q:1}, Mg:{name:'magnesium',sym:'Mg',q:2},
+  Al:{name:'aluminium',sym:'Al',q:3}, Ag:{name:'silver',sym:'Ag',q:1}, NH4:{name:'ammonium',sym:'NH₄',q:1,poly:true},
+  Fe2:{name:'iron(II)',sym:'Fe',q:2,tm:true}, Fe3:{name:'iron(III)',sym:'Fe',q:3,tm:true},
+  Cu1:{name:'copper(I)',sym:'Cu',q:1,tm:true}, Cu2:{name:'copper(II)',sym:'Cu',q:2,tm:true},
+  Co2:{name:'cobalt(II)',sym:'Co',q:2,tm:true}, Cr3:{name:'chromium(III)',sym:'Cr',q:3,tm:true},
+  Sn2:{name:'tin(II)',sym:'Sn',q:2,tm:true}, Sn4:{name:'tin(IV)',sym:'Sn',q:4,tm:true},
+  Pb2:{name:'lead(II)',sym:'Pb',q:2,tm:true}, Pb4:{name:'lead(IV)',sym:'Pb',q:4,tm:true}, Mn2:{name:'manganese(II)',sym:'Mn',q:2,tm:true}
+};
+const AN={
+  Cl:{name:'chloride',sym:'Cl',q:1}, O:{name:'oxide',sym:'O',q:2},
+  OH:{name:'hydroxide',sym:'OH',q:1,poly:true}, NO3:{name:'nitrate',sym:'NO₃',q:1,poly:true}, NO2:{name:'nitrite',sym:'NO₂',q:1,poly:true},
+  SO4:{name:'sulfate',sym:'SO₄',q:2,poly:true}, SO3:{name:'sulfite',sym:'SO₃',q:2,poly:true}, CO3:{name:'carbonate',sym:'CO₃',q:2,poly:true},
+  HCO3:{name:'hydrogen carbonate',sym:'HCO₃',q:1,poly:true}, PO4:{name:'phosphate',sym:'PO₄',q:3,poly:true}
+};
+const METAL={Fe:'iron',Cu:'copper',Cr:'chromium',Pb:'lead',Ag:'silver',Zn:'zinc',Sn:'tin',Co:'cobalt'};
+const ONECHARGE={Ag:1,Zn:2};
+const cLabel=k=>CAT[k].sym+chgTxt(CAT[k].q,false);
+const aLabel=k=>AN[k].sym+chgTxt(AN[k].q,true);
+function part(ion,n){ if(!n) return ''; if(n>1) return ion.poly?'('+ion.sym+')'+sub(n):ion.sym+sub(n); return ion.sym; }
+function plain(s){return s.replace(/[₀-₉]/g,d=>String(SUBD.indexOf(d)));}
+function normF(s){return plain(s).replace(/\s+/g,'').replace(/\[/g,'(').replace(/\]/g,')').replace(/[⁺⁻+−-]/g,'');}
+function normName(s){
+  return s.toLowerCase().replace(/sulph/g,'sulf').replace(/aluminum/g,'aluminium')
+    .replace(/\s*\(\s*/g,'(').replace(/\s*\)\s*/g,') ').replace(/\s+/g,' ').trim();
+}
+
+/* ===== courses (data) ===== */
+const COURSES=[
+ {id:'starter',kind:'mcq',tag:'Everyone first',title:'Starter: Ion Toolkit Check',blurb:'6 quick questions on ion names, charges and Roman numerals.',
+  intro:'Warm up. Use the Toolkit if you need it. A star for each first-try answer.',
+  items:[
+   {q:'What is the formula of the nitrate ion?',o:['NO₂⁻','NO₃⁻','N³⁻'],a:1,hint:'-ate has one MORE oxygen than -ite. Nitrite is NO₂⁻, so nitrate has 3 oxygen atoms.',why:'Nitrate is NO₃⁻.'},
+   {q:'What does (III) mean in iron(III)?',o:['There are 3 iron atoms','The iron ion has a charge of 3+','There are 3 negative ions'],a:1,hint:'The Roman numeral is always the CHARGE of the metal ion.',why:'Iron(III) is Fe³⁺.'},
+   {q:'Which one is the copper(II) ion?',o:['Cu⁺','Cu₂','Cu²⁺'],a:2,hint:'(II) means a charge of 2+. A charge is written up high, not low.',why:'Copper(II) is Cu²⁺. Cu⁺ is copper(I).'},
+   {q:'What is the charge of the sulfate ion, SO₄?',o:['1−','2−','4−'],a:1,hint:'The small 4 counts oxygen atoms. It is not the charge. Check the Toolkit.',why:'Sulfate is SO₄²⁻.'},
+   {q:'Which metal does NOT need a Roman numeral?',o:['iron','zinc','copper'],a:1,hint:'Some metals have only ONE charge. Zinc is always Zn²⁺ and silver is always Ag⁺.',why:'Zinc has only one charge, so we just say “zinc”.'},
+   {q:'Which ion is positive?',o:['ammonium, NH₄⁺','hydroxide, OH⁻','carbonate, CO₃²⁻'],a:0,hint:'Look for the + sign.',why:'Ammonium, NH₄⁺, is the positive polyatomic ion.'}
+  ]},
+ {id:'mainA',kind:'build',tag:'Main · choose 2',title:'Main A: Criss-cross Kitchen',blurb:'Name → formula. Pick the ions, cross the charges, simplify, write it.',
+  intro:'Read the order. Build the formula with the criss-cross. One star for each order.',
+  items:[
+   {name:'copper(II) nitrate',c:'Cu2',a:'NO3',ct:['Cu1','Cu2','Co2','Fe2'],at:['NO2','NO3','Cl','SO4']},
+   {name:'iron(III) sulfate',c:'Fe3',a:'SO4',ct:['Fe2','Fe3','Cr3','Cu2'],at:['SO3','SO4','O','CO3']},
+   {name:'ammonium phosphate',c:'NH4',a:'PO4',ct:['Na','NH4','K','Al'],at:['PO4','NO3','SO4','OH']},
+   {name:'tin(IV) oxide',c:'Sn4',a:'O',ct:['Sn2','Sn4','Pb4','Mn2'],at:['O','OH','Cl','CO3']},
+   {name:'lead(II) carbonate',c:'Pb2',a:'CO3',ct:['Pb2','Pb4','Co2','Cu2'],at:['CO3','HCO3','SO4','NO3']},
+   {name:'aluminium hydroxide',c:'Al',a:'OH',ct:['Al','Ag','Mg','K'],at:['OH','O','NO3','Cl']}
+  ]},
+ {id:'mainB',kind:'reverse',tag:'Main · choose 2',title:'Main B: Reverse Criss-cross Detective',blurb:'Formula → name. Send the small numbers back up to find the metal’s charge.',
+  intro:'The small numbers in a formula came from the charges. Send them back to find the metal’s charge, then name it. One star for each case.',
+  items:[
+   {m:'Fe',mn:1,a:'Cl',an:3},
+   {m:'Fe',mn:2,a:'SO4',an:3},
+   {m:'Cu',mn:1,a:'O',an:1},
+   {m:'Cu',mn:1,a:'SO4',an:1},
+   {m:'Ag',mn:1,a:'NO3',an:1},
+   {m:'Pb',mn:1,a:'O',an:2},
+   {m:'Cr',mn:1,a:'PO4',an:1}
+  ]},
+ {id:'mainC',kind:'mcq',tag:'Main · choose 2',title:'Main C: Name it Fast',blurb:'8 mixed formulas. Pick the right name.',
+  intro:'Polyatomic ions and transition metals mixed together. A star for each first-try answer.',
+  items:[
+   {q:'KNO₃',o:['potassium nitrite','potassium nitrate','potassium nitride'],a:1,hint:'NO₃⁻ has 3 oxygen atoms: the -ate ion.',why:'KNO₃ is potassium nitrate.'},
+   {q:'Mg(OH)₂',o:['magnesium dihydroxide','magnesium(II) hydroxide','magnesium hydroxide'],a:2,hint:'No prefixes like di-. Magnesium has only one charge, so no Roman numeral.',why:'Mg(OH)₂ is magnesium hydroxide.'},
+   {q:'FeCl₂',o:['iron chloride','iron(II) chloride','iron(I) chloride'],a:1,hint:'Reverse criss-cross: the 2 on Cl goes back to iron, so iron is 2+.',why:'FeCl₂ is iron(II) chloride.'},
+   {q:'Cu₂O',o:['copper(I) oxide','copper(II) oxide','dicopper oxide'],a:0,hint:'O has no number, so its subscript is 1. That 1 goes back to copper: Cu⁺. Check: the 2 on Cu goes to O → 2−. Correct!',why:'Cu₂O is copper(I) oxide.'},
+   {q:'NaHCO₃',o:['sodium carbonate','sodium hydrogen carbonate','sodium hydroxide carbonate'],a:1,hint:'HCO₃⁻ has its own name in the Toolkit.',why:'NaHCO₃ is sodium hydrogen carbonate (baking soda).'},
+   {q:'ZnSO₄',o:['zinc(II) sulfate','zinc sulfite','zinc sulfate'],a:2,hint:'Zinc has only one charge, so no Roman numeral. SO₄ is the -ate ion.',why:'ZnSO₄ is zinc sulfate.'},
+   {q:'Co(NO₃)₃',o:['cobalt(III) nitrate','cobalt(II) nitrate','cobalt nitrate'],a:0,hint:'The 3 outside the brackets goes back to cobalt.',why:'Co(NO₃)₃ is cobalt(III) nitrate.'},
+   {q:'(NH₄)₂SO₃',o:['diammonium sulfate','ammonium sulfate','ammonium sulfite'],a:2,hint:'Count the oxygen atoms: SO₃ is the -ite ion.',why:'(NH₄)₂SO₃ is ammonium sulfite.'}
+  ]},
+ {id:'dessert',kind:'doctor',tag:'Dessert · challenge',title:'Dessert: Error Doctor',blurb:'Find the mistake in a student’s work, then write the correct answer.',
+  intro:'Each student made ONE mistake. Find it (1 star on the first try), then fix it (1 star).',
+  items:[
+   {work:'copper(II) nitrate  =  CuNO₃₂',o:['The Roman numeral is wrong','Brackets are missing around NO₃','Nitrate should be NO₂'],a:1,hint:'NO₃ is needed 2 times. The 2 must count the whole group.',fix:'formula',ans:'Cu(NO3)2',show:'Cu(NO₃)₂'},
+   {work:'FeO  =  iron(I) oxide',o:['FeO does not exist','Iron cannot form ions','Skipped the check: oxide must be 2−, so multiply both numbers by 2'],a:2,hint:'Reverse criss-cross gives Fe 1 and O 1. But oxide is always O²⁻. Does it match?',fix:'name',ans:'iron(II) oxide',show:'iron(II) oxide'},
+   {work:'ZnCl₂  =  zinc(II) chloride',o:['Zinc has only one charge, so no Roman numeral','Chloride should be chlorite','The numeral should be (I)'],a:0,hint:'Look at the Toolkit: which metals have only one charge?',fix:'name',ans:'zinc chloride',show:'zinc chloride'},
+   {work:'Fe₂(SO₄)₃  =  iron(II) sulfate',o:['There should be no brackets','Used iron’s own number (2). The number on SO₄ (3) goes back to iron','Sulfate should be sulfite'],a:1,hint:'In reverse criss-cross, the metal gets the number from the NEGATIVE ion.',fix:'name',ans:'iron(III) sulfate',show:'iron(III) sulfate'},
+   {work:'ammonium sulfate  =  NH₄SO₄',o:['Missed the criss-cross: ammonium needs the 2, in brackets','Sulfate is SO₃','Ammonium is NH₃'],a:0,hint:'Cross the charges: NH₄⁺ and SO₄²⁻. Where does the 2 go?',fix:'formula',ans:'(NH4)2SO4',show:'(NH₄)₂SO₄'},
+   {work:'tin(IV) oxide  =  Sn₂O₄',o:['Oxide needs brackets','Not simplified: 2 and 4 can both be divided by 2','Tin(IV) should be Sn⁴⁻'],a:1,hint:'Look at the two small numbers. Do they share a factor?',fix:'formula',ans:'SnO2',show:'SnO₂'}
+  ]}
+];
+const maxStars=c=>c.kind==='doctor'?c.items.length*2:c.items.length;
+const TOTAL=COURSES.reduce((s,c)=>s+maxStars(c),0), TARGET=20;
+
+/* ===== saved progress (per device) ===== */
+const KEY='formula-cafe-v1';
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
+let P=load();
+COURSES.forEach(c=>{ if(!P[c.id]||!Array.isArray(P[c.id].stars)) P[c.id]={stars:[]}; });
+const cstars=id=>P[id].stars.reduce((s,v)=>s+(v||0),0);
+const cdone=id=>P[id].stars.filter(v=>v!==undefined&&v!==null).length;
+const total=()=>COURSES.reduce((s,c)=>s+cstars(c.id),0);
+
+/* ===== view state ===== */
+const view=document.getElementById('view');
+let V={screen:'menu',course:null,i:0,confirmReset:false};
+let IS=null; // current item state
+
+function setStars(){document.getElementById('starTotal').textContent=`★ ${total()} / ${TOTAL}`;}
+
+/* ===== MENU ===== */
+function renderMenu(){
+  V.screen='menu';
+  const t=total();
+  view.innerHTML=`
+  <div class="plate">
+    <p><b>My plate:</b> ${t} ★ of ${TOTAL}. Aim for ${TARGET} ★.</p>
+    <div class="bar" aria-hidden="true"><i style="width:${Math.min(100,t/TARGET*100)}%"></i></div>
+  </div>
+  <div class="howto"><b>How to order</b>
+    <ol><li>Everyone does the <b>Starter</b>.</li><li>Choose <b>2 Mains</b>. A and B are the criss-cross and reverse criss-cross.</li><li>Finished? Try the <b>Dessert</b>.</li><li>Write your stars on your plate sheet.</li></ol></div>
+  <div class="menu">${COURSES.map(c=>{
+    const n=c.items.length,d=cdone(c.id),full=d>=n;
+    return `<article class="course ${c.id==='starter'?'starter':''}">
+      <span class="tag">${c.tag}</span><h3>${c.title}</h3><p>${c.blurb}</p>
+      <span class="meta">${d} / ${n} done · ★ ${cstars(c.id)} / ${maxStars(c)} ${full?'<span class="done-badge">✓</span>':''}</span>
+      <button class="btn ${full?'ghost':'primary'}" data-act="open" data-v="${c.id}">${full?'Practise again':d?'Continue':'Start'}</button>
+    </article>`;}).join('')}</div>
+  <div class="resetrow">${V.confirmReset
+    ?`Clear all stars on this device? <button class="btn small primary" data-act="resetYes">Yes, clear</button><button class="btn small" data-act="resetNo">Keep them</button>`
+    :`<button class="btn small" data-act="reset">Start again</button>`}</div>`;
+  setStars(); window.scrollTo(0,0);
+}
+
+/* ===== TOOLKIT ===== */
+function renderToolkit(){
+  V.screen='toolkit';
+  const polys=['OH','NO3','NO2','SO4','SO3','CO3','HCO3','PO4'];
+  const tms=['Fe2','Fe3','Cu1','Cu2','Co2','Cr3','Sn2','Sn4','Pb2','Pb4','Mn2'];
+  view.innerHTML=`
+  <div class="crumbs"><h2>Toolkit</h2><button class="btn small ghost" data-act="menu">← Back to menu</button></div>
+  <div class="tk">
+    <section><h3>Criss-cross: name → formula</h3><ol>
+      <li>Write both ions with their charges.</li>
+      <li>Each charge number moves to the OTHER ion as its small number (subscript). Drop the signs.</li>
+      <li>Simplify if both numbers divide by the same number.</li>
+      <li>A polyatomic ion used more than once goes in brackets: Ca(NO₃)₂.</li></ol></section>
+    <section><h3>Reverse criss-cross: formula → name</h3><ol>
+      <li>The small number on the negative ion goes back up to the metal as its charge.</li>
+      <li>The small number on the metal goes back to the negative ion. No number = 1.</li>
+      <li><b>Check:</b> is the negative ion’s charge the real one? If not, multiply both numbers until it is.</li>
+      <li>Write the metal’s charge as a Roman numeral: iron(III).</li></ol></section>
+    <section><h3>Polyatomic ions</h3><table>${polys.map(k=>`<tr><td>${AN[k].name}</td><td class="f">${aLabel(k)}</td></tr>`).join('')}
+      <tr><td>ammonium</td><td class="f">NH₄⁺</td></tr></table></section>
+    <section><h3>Transition metal ions</h3><table>${tms.map(k=>`<tr><td>${CAT[k].name}</td><td class="f">${cLabel(k)}</td></tr>`).join('')}
+      <tr><td>zinc · silver <b>(one charge, no numeral)</b></td><td class="f">Zn²⁺ · Ag⁺</td></tr></table></section>
+    <section><h3>Roman numerals</h3><table>
+      <tr><td class="f">I</td><td>1</td></tr><tr><td class="f">II</td><td>2</td></tr><tr><td class="f">III</td><td>3</td></tr><tr><td class="f">IV</td><td>4</td></tr></table>
+      <p class="pl">Other ions: chloride Cl⁻ · oxide O²⁻ · sodium Na⁺ · potassium K⁺ · magnesium Mg²⁺ · aluminium Al³⁺</p></section>
+    <section><h3>Key words</h3><table>
+      <tr><td><b>subscript</b>: small number, how many</td><td class="ar">الرقم السفلي</td></tr>
+      <tr><td><b>charge</b>: + or − on an ion</td><td class="ar">الشحنة</td></tr>
+      <tr><td><b>polyatomic ion</b>: group of atoms, one charge</td><td class="ar">أيون متعدد الذرات</td></tr>
+      <tr><td><b>transition metal</b>: middle-block metal</td><td class="ar">الفلزات الانتقالية</td></tr>
+      <tr><td><b>Roman numeral</b>: shows the metal’s charge</td><td class="ar">الأرقام الرومانية</td></tr></table></section>
+  </div>`;
+  window.scrollTo(0,0);
+}
+
+/* ===== COURSE ===== */
+function openCourse(id){
+  V.course=COURSES.find(c=>c.id===id);
+  const n=V.course.items.length;
+  const firstOpen=[...Array(n).keys()].find(k=>P[id].stars[k]===undefined||P[id].stars[k]===null);
+  V.i=firstOpen===undefined?0:firstOpen;
+  if(firstOpen===undefined){P[id].stars=[];save();}
+  startItem();
+}
+function startItem(){
+  const c=V.course, it=c.items[V.i];
+  IS={tries:0,done:false,msg:'',cls:'',step:0,typed:'',star:0};
+  if(c.kind==='build'){Object.assign(IS,{cp:null,ap:null,sc:null,sa:null,simp:false,wrongC:[],wrongA:[]});}
+  if(c.kind==='reverse'){Object.assign(IS,{mq:null,aq:null,fac:null,roman:null});}
+  if(c.kind==='doctor'){Object.assign(IS,{phase:0,diagStar:0,wrong:[]});}
+  if(c.kind==='mcq'){IS.wrong=[];}
+  renderCourse();
+}
+function finishItem(stars){
+  P[V.course.id].stars[V.i]=stars; save(); IS.done=true; setStars();
+}
+function nextItem(){
+  const n=V.course.items.length;
+  const k=[...Array(n).keys()].find(j=>j>V.i&&(P[V.course.id].stars[j]===undefined||P[V.course.id].stars[j]===null));
+  const k2=k!==undefined?k:[...Array(n).keys()].find(j=>P[V.course.id].stars[j]===undefined||P[V.course.id].stars[j]===null);
+  if(k2===undefined){renderFinish();return;}
+  V.i=k2; startItem();
+}
+function renderFinish(){
+  const c=V.course;
+  view.innerHTML=`<div class="panel finish"><p class="kicker">${c.tag}</p><h2>${c.title}: finished</h2>
+    <p class="big">★ ${cstars(c.id)} / ${maxStars(c)}</p><p>Write this on your plate sheet.</p>
+    <div class="trow" style="justify-content:center"><button class="btn primary" data-act="menu">Back to the menu</button>
+    <button class="btn ghost" data-act="open" data-v="${c.id}">Practise again</button></div></div>`;
+  window.scrollTo(0,0);
+}
+
+function dotsHTML(){
+  const c=V.course;
+  return c.items.map((_,k)=>{const d=P[c.id].stars[k]!==undefined&&P[c.id].stars[k]!==null;
+    return `<span class="dot ${d?'done':k===V.i?'cur':''}" aria-label="Item ${k+1}${d?' done':''}">${k+1}</span>`;}).join('');
+}
+function renderCourse(){
+  V.screen='course';
+  const c=V.course;
+  let body='';
+  if(c.kind==='mcq') body=mcqHTML();
+  else if(c.kind==='build') body=buildHTML();
+  else if(c.kind==='reverse') body=revHTML();
+  else body=doctorHTML();
+  view.innerHTML=`<div class="panel">
+    <div class="crumbs"><p class="kicker">${c.tag} · ${V.i+1} of ${c.items.length}</p><button class="btn small ghost" data-act="menu">← Menu</button></div>
+    <h2>${c.title}</h2><p class="intro">${c.intro}</p>
+    <div id="dots">${dotsHTML()}</div>
+    <div class="task">${body}</div>
+    ${IS.done?`<div class="trow"><button class="btn primary" data-act="next">Next →</button></div>`:''}
+  </div>`;
+  const inp=document.getElementById('ans'); if(inp){inp.value=IS.typed;}
+}
+const fbHTML=()=>IS.msg?`<p class="fb ${IS.cls}" role="status">${IS.msg}</p>`:'';
+
+/* ----- MCQ ----- */
+function mcqHTML(){
+  const it=V.course.items[V.i], isFormula=V.course.id==='mainC';
+  return `${isFormula?'<p class="lbl">What is the name of this compound?</p><p class="big">'+it.q+'</p>':'<p class="q">'+it.q+'</p>'}
+   <div class="opts">${it.o.map((o,k)=>`<button class="opt ${IS.done&&k===it.a?'right':''} ${IS.wrong.includes(k)?'wrong':''}" data-act="mcq" data-v="${k}" ${IS.done||IS.wrong.includes(k)?'disabled':''}>${o}</button>`).join('')}</div>${fbHTML()}`;
+}
+function answerMcq(k){
+  const it=V.course.items[V.i];
+  if(k===it.a){const st=IS.tries===0?1:0; finishItem(st); IS.cls='good'; IS.msg=`✓ ${it.why} ${st?'+1 ★':'(No star this time: first try only.)'}`;}
+  else{IS.tries++; IS.wrong.push(k); IS.cls='bad'; IS.msg=`<b>Not quite.</b> 💡 ${it.hint}`;}
+  renderCourse();
+}
+
+/* ----- BUILD (criss-cross) ----- */
+const BSTEPS=['Pick the positive ion.','Pick the negative ion.','Tap each gold charge. It crosses to the OTHER ion.','Simplify, if you can.','Type the formula and press Check.'];
+function buildHTML(){
+  const it=V.course.items[V.i];
+  let main='';
+  if(IS.step===0||IS.step===1){
+    main=`<p class="lbl">Positive ion (+)</p><div class="chips">${it.ct.map(k=>`<button class="chip ${IS.cp===k?'on':''} ${IS.wrongC.includes(k)?'no':''}" data-act="pc" data-v="${k}" ${IS.step!==0?'disabled':''}>${CAT[k].name} <b>${cLabel(k)}</b></button>`).join('')}</div>
+      ${IS.step>=1?`<p class="lbl">Negative ion (−)</p><div class="chips">${it.at.map(k=>`<button class="chip ${IS.ap===k?'on':''} ${IS.wrongA.includes(k)?'no':''}" data-act="pa" data-v="${k}">${AN[k].name} <b>${aLabel(k)}</b></button>`).join('')}</div>`:''}`;
+  } else {
+    const c=CAT[it.c], a=AN[it.a];
+    main=`<div class="cross">
+      <div class="tile"><span class="tn">${c.name}</span><span class="sym">${cLabel(it.c)}</span>
+        <span class="sl">small number on ${c.sym}</span><span class="slot ${IS.sc!==null?'filled':''}">${IS.sc!==null?IS.sc:'?'}</span>
+        <button class="chg ${IS.sa!==null?'used':''}" data-act="cross" data-v="c" ${IS.step!==2||IS.sa!==null?'disabled':''}>charge ${c.q} →</button></div>
+      <div class="x" aria-hidden="true">✕</div>
+      <div class="tile"><span class="tn">${a.name}</span><span class="sym">${aLabel(it.a)}</span>
+        <span class="sl">small number on ${a.sym}</span><span class="slot ${IS.sa!==null?'filled':''}">${IS.sa!==null?IS.sa:'?'}</span>
+        <button class="chg ${IS.sc!==null?'used':''}" data-act="cross" data-v="a" ${IS.step!==2||IS.sc!==null?'disabled':''}>← charge ${a.q}</button></div>
+    </div>
+    ${IS.sc!==null&&IS.sa!==null?`<p class="count">Ions in the formula: <b>${IS.sc} × ${cLabel(it.c)}</b> and <b>${IS.sa} × ${aLabel(it.a)}</b></p>`:''}
+    ${IS.step===3?`<p class="q" style="margin-top:12px">Can ${IS.sc} and ${IS.sa} both be divided by the same number (2 or 3)?</p>
+      <div class="trow"><button class="btn primary" data-act="simp" data-v="yes">Yes: divide both</button><button class="btn ghost" data-act="simp" data-v="no">No: keep them</button></div>`:''}
+    ${IS.step>=4?`<div class="trow"><label for="ans"><b>Formula</b></label><input id="ans" class="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="for example Ca(NO3)2" ${IS.done?'disabled':''}>
+      <button class="btn primary" data-act="checkF" ${IS.done?'disabled':''}>Check</button></div>
+      <p class="pl">Type normal numbers, like Ca(NO3)2. Small numbers are not needed.</p>`:''}`;
+  }
+  return `<p class="lbl">Order</p><p class="q">“${it.name}”</p>
+    <div class="banner">Step ${Math.min(IS.step+1,5)} of 5: ${IS.done?'Done! Press Next.':BSTEPS[IS.step]}</div>
+    ${main}${fbHTML()}
+    <ol class="steplist">${BSTEPS.map((s,k)=>`<li class="${k<IS.step||IS.done?'tick':k===IS.step?'now':''}"><span class="box">${k<IS.step||IS.done?'✓':k+1}</span><span>${s}</span></li>`).join('')}</ol>`;
+}
+function pickC(k){
+  const it=V.course.items[V.i];
+  if(k===it.c){IS.cp=k;IS.step=1;IS.msg='';}
+  else{IS.wrongC.push(k);IS.cls='bad';IS.tries++;
+    const want=CAT[it.c];
+    IS.msg=want.tm?`<b>Not this one.</b> 💡 The Roman numeral is the charge: ${want.name} means ${chgPlain(want.q,false)}.`:`<b>Not this one.</b> 💡 Read the name again and check the Toolkit.`;}
+  renderCourse();
+}
+function pickA(k){
+  const it=V.course.items[V.i];
+  if(k===it.a){IS.ap=k;IS.step=2;IS.msg='';}
+  else{IS.wrongA.push(k);IS.cls='bad';IS.tries++;
+    const w=AN[k].name,r=AN[it.a].name;
+    IS.msg=(w.slice(0,3)===r.slice(0,3))?`<b>Careful.</b> 💡 -ate has one MORE oxygen than -ite. We need ${r}.`:`<b>Not this one.</b> 💡 Find “${r}” in the Toolkit.`;}
+  renderCourse();
+}
+function crossIt(side){
+  const it=V.course.items[V.i];
+  if(side==='c') IS.sa=CAT[it.c].q; else IS.sc=AN[it.a].q;
+  IS.cls='good'; IS.msg=side==='c'?`The ${CAT[it.c].q} crossed to ${AN[it.a].sym} ✓`:`The ${AN[it.a].q} crossed to ${CAT[it.c].sym} ✓`;
+  if(IS.sc!==null&&IS.sa!==null){IS.step=3;IS.msg='Both small numbers are in place.';}
+  renderCourse();
+}
+function simplify(ans){
+  const g=gcd(IS.sc,IS.sa);
+  if(ans==='yes'&&g>1){IS.sc/=g;IS.sa/=g;IS.simp=true;IS.step=4;IS.cls='good';IS.msg=`✓ Divided both by ${g}. Now it is ${IS.sc} and ${IS.sa}.`;}
+  else if(ans==='no'&&g===1){IS.step=4;IS.cls='good';IS.msg='✓ Right, they share no factor. Keep them.';}
+  else if(ans==='yes'){IS.tries++;IS.cls='bad';IS.msg=`<b>Look again.</b> 💡 ${IS.sc} and ${IS.sa} cannot both be divided by 2 or 3. A 1 cannot be divided.`;}
+  else{IS.tries++;IS.cls='bad';IS.msg=`<b>Look again.</b> 💡 ${IS.sc} and ${IS.sa} can both be divided by ${g}.`;}
+  renderCourse();
+}
+function checkFormula(){
+  const it=V.course.items[V.i], c=CAT[it.c], a=AN[it.a];
+  const txt=IS.typed;
+  if(!txt.trim()){IS.cls='bad';IS.msg='<b>Type a formula first.</b>';return renderCourse();}
+  const want=part(c,IS.sc)+part(a,IS.sa), wantP=normF(want), got=normF(txt);
+  if(got===wantP||got.toLowerCase()===wantP.toLowerCase()){
+    const capsNote=got===wantP?'':` Remember the capital letters: ${want}.`;
+    finishItem(1); IS.cls='good'; IS.msg=`✓ Correct! ${it.name} is ${want}.${capsNote} +1 ★`;
+  } else {
+    IS.tries++; IS.cls='bad';
+    const noBr=normF(c.sym+(IS.sc>1?IS.sc:'')+a.sym+(IS.sa>1?IS.sa:'')).toLowerCase();
+    if(got.toLowerCase()===noBr&&((c.poly&&IS.sc>1)||(a.poly&&IS.sa>1))){
+      const pi=a.poly&&IS.sa>1?a:c, n=a.poly&&IS.sa>1?IS.sa:IS.sc;
+      IS.msg=`<b>Almost!</b> 💡 ${pi.sym} is needed ${n} times. Put it in brackets with the ${n} outside: (${pi.sym})${sub(n)}.`;
+    } else IS.msg='<b>Not quite.</b> 💡 Use the two small numbers you made. The number 1 is not written.';
+  }
+  renderCourse();
+}
+
+/* ----- REVERSE criss-cross ----- */
+const RSTEPS=['Tap the small number on the NEGATIVE ion. It goes back to the metal.','Tap the small number on the METAL. It goes back to the negative ion.','Check the negative ion’s charge.','Choose the Roman numeral.','Type the name and press Check.'];
+function revFormula(it){return part({sym:it.m},it.mn)+part(AN[it.a],it.an);}
+function revHTML(){
+  const it=V.course.items[V.i], a=AN[it.a];
+  const real=a.q;
+  const mq=IS.mq, aq=IS.aq;
+  const chip=(side,n)=>`<button class="subchip ${n===1?'ghost':''} ${(side==='a'&&mq!==null)||(side==='m'&&aq!==null)?'used':''}" data-act="rev" data-v="${side}" ${IS.step>1?'disabled':''} aria-label="small number ${n}">${n}</button>`;
+  let main=`<p class="lbl">Formula</p><p class="big" style="text-align:center">${revFormula(it)}</p>
+   <div class="rev">
+     <div class="part"><span class="pl">metal charge</span><span class="bubble ${mq!==null?(IS.fac?'fixed':'filled'):''}">${mq!==null?chgPlain(mq,false):'?'}</span>
+       <div class="symrow"><span class="sym">${it.m}</span>${chip('m',it.mn)}</div><span class="pl">${it.mn===1?'no number = 1':''}</span></div>
+     <div class="part"><span class="pl">negative ion charge</span><span class="bubble ${aq!==null?(IS.fac?'fixed':'filled'):''}">${aq!==null?chgPlain(aq,true):'?'}</span>
+       <div class="symrow"><span class="sym">${a.poly&&it.an>1?'('+a.sym+')':a.sym}</span>${chip('a',it.an)}</div><span class="pl">${it.an===1?'no number = 1':''}</span></div>
+   </div>`;
+  if(IS.step===2){
+    main+=`<div class="checkcard"><p style="margin:0 0 6px"><b>Check:</b> you got <b>${a.sym} ${chgPlain(aq,true)}</b>. The Toolkit says ${a.name} is always <b>${aLabel(it.a)}</b>.</p>
+      <div class="trow"><button class="btn primary" data-act="fac" data-v="1">It matches ✓</button><button class="btn ghost" data-act="fac" data-v="2">Multiply both by 2</button><button class="btn ghost" data-act="fac" data-v="3">Multiply both by 3</button></div></div>`;
+  }
+  if(IS.step===3){
+    main+=`<p class="q" style="margin-top:10px">The ${METAL[it.m]} ion is ${it.m}${chgTxt(mq,false)}. Which Roman numeral?</p>
+      <div class="trow">${['I','II','III','IV'].map(r=>`<button class="btn ghost" data-act="roman" data-v="${r}">${r}</button>`).join('')}<button class="btn ghost" data-act="roman" data-v="none">No numeral</button></div>`;
+  }
+  if(IS.step>=4){
+    main+=`<div class="trow"><label for="ans"><b>Name</b></label><input id="ans" class="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="for example iron(III) chloride" ${IS.done?'disabled':''}>
+      <button class="btn primary" data-act="checkN" ${IS.done?'disabled':''}>Check</button></div><p class="pl">Metal name + (Roman numeral) + negative ion name.</p>`;
+  }
+  return `<div class="banner">Step ${Math.min(IS.step+1,5)} of 5: ${IS.done?'Done! Press Next.':RSTEPS[IS.step]}</div>${main}${fbHTML()}
+   <ol class="steplist">${RSTEPS.map((s,k)=>`<li class="${k<IS.step||IS.done?'tick':k===IS.step?'now':''}"><span class="box">${k<IS.step||IS.done?'✓':k+1}</span><span>${s}</span></li>`).join('')}</ol>`;
+}
+function revTap(side){
+  const it=V.course.items[V.i];
+  if(IS.step===0){
+    if(side==='a'){IS.mq=it.an;IS.step=1;IS.cls='good';IS.msg=`The ${it.an} went back up to ${it.m} ✓`;}
+    else{IS.tries++;IS.cls='bad';IS.msg='<b>Start with the negative ion.</b> 💡 Its small number tells you the metal’s charge.';}
+  } else if(IS.step===1){
+    if(side==='m'){IS.aq=it.mn;IS.step=2;IS.msg='';}
+    else{IS.cls='bad';IS.msg='<b>That one is done.</b> 💡 Now tap the small number on the metal.';}
+  }
+  renderCourse();
+}
+function revFac(f){
+  const it=V.course.items[V.i], real=AN[it.a].q, need=real/IS.aq;
+  if(f===need){
+    if(f>1){IS.mq*=f;IS.aq*=f;IS.cls='good';IS.msg=`✓ Multiplied both by ${f}. Now ${AN[it.a].name} is ${chgPlain(IS.aq,true)} (correct) and ${METAL[it.m]} is ${chgPlain(IS.mq,false)}.`;}
+    else{IS.cls='good';IS.msg=`✓ It matches. ${METAL[it.m]} is ${chgPlain(IS.mq,false)}.`;}
+    IS.fac=f;IS.step=3;
+  } else {
+    IS.tries++;IS.cls='bad';
+    IS.msg=need===1?`<b>Look again.</b> 💡 You have ${chgPlain(IS.aq,true)} and ${AN[it.a].name} really is ${chgPlain(real,true)}. It already matches.`
+      :`<b>Look again.</b> 💡 You have ${chgPlain(IS.aq,true)}, but ${AN[it.a].name} must be ${chgPlain(real,true)}. What times ${IS.aq} makes ${real}?`;
+  }
+  renderCourse();
+}
+function revRoman(r){
+  const it=V.course.items[V.i], one=ONECHARGE[it.m]!==undefined, want=one?'none':ROMAN[IS.mq];
+  if(r===want){IS.roman=r;IS.step=4;IS.cls='good';IS.msg=one?`✓ Right. ${METAL[it.m]} only forms ${it.m}${chgTxt(ONECHARGE[it.m],false)}, so no numeral.`:`✓ ${chgPlain(IS.mq,false)} → (${r}).`;}
+  else{IS.tries++;IS.cls='bad';IS.msg=one?`<b>Careful.</b> 💡 ${METAL[it.m]} has only one charge. Check the Toolkit.`:`<b>Not quite.</b> 💡 The numeral equals the charge: ${chgPlain(IS.mq,false)}.`;}
+  renderCourse();
+}
+function checkName(){
+  const it=V.course.items[V.i], one=ONECHARGE[it.m]!==undefined;
+  const want=METAL[it.m]+(one?'':'('+ROMAN[IS.mq]+')')+' '+AN[it.a].name;
+  if(!IS.typed.trim()){IS.cls='bad';IS.msg='<b>Type a name first.</b>';return renderCourse();}
+  const got=normName(IS.typed);
+  if(got===normName(want)){finishItem(1);IS.cls='good';IS.msg=`✓ Correct! ${revFormula(it)} is ${want}. +1 ★`;}
+  else{IS.tries++;IS.cls='bad';
+    let h='Write the metal, then its numeral in brackets, then the negative ion.';
+    if(/\b(di|tri|mono)/.test(got)) h='No prefixes like di- or tri- in ionic names.';
+    else if(!one&&!/\(/.test(got)) h=`Add the Roman numeral in brackets: ${METAL[it.m]}(${ROMAN[IS.mq]}).`;
+    else if(got.indexOf(normName(AN[it.a].name))<0) h=`Check the negative ion’s name: ${aLabel(it.a)} is ${AN[it.a].name}.`;
+    IS.msg=`<b>Not quite.</b> 💡 ${h}`;}
+  renderCourse();
+}
+
+/* ----- DOCTOR ----- */
+function doctorHTML(){
+  const it=V.course.items[V.i];
+  let h=`<p class="lbl">A student wrote:</p><p class="work">${it.work}</p>
+    <p class="q">1. What is the mistake?</p>
+    <div class="opts">${it.o.map((o,k)=>`<button class="opt ${IS.phase>0&&k===it.a?'right':''} ${IS.wrong.includes(k)?'wrong':''}" data-act="diag" data-v="${k}" ${IS.phase>0||IS.wrong.includes(k)?'disabled':''}>${o}</button>`).join('')}</div>`;
+  if(IS.phase>0){
+    h+=`<p class="q">2. Fix it: write the correct ${it.fix}.</p>
+     <div class="trow"><input id="ans" class="ans" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Correct ${it.fix}" placeholder="${it.fix==='formula'?'for example Ca(NO3)2':'for example iron(III) sulfate'}" ${IS.done?'disabled':''}>
+     <button class="btn primary" data-act="fix" ${IS.done?'disabled':''}>Check</button></div>`;
+  }
+  return h+fbHTML();
+}
+function diagnose(k){
+  const it=V.course.items[V.i];
+  if(k===it.a){IS.diagStar=IS.tries===0?1:0;IS.phase=1;IS.cls='good';IS.msg=`✓ Good diagnosis. ${IS.diagStar?'+1 ★':'(No star: first try only.)'} Now fix it.`;}
+  else{IS.tries++;IS.wrong.push(k);IS.cls='bad';IS.msg=`<b>Not this one.</b> 💡 ${it.hint}`;}
+  renderCourse();
+}
+function fixIt(){
+  const it=V.course.items[V.i];
+  if(!IS.typed.trim()){IS.cls='bad';IS.msg='<b>Type your answer first.</b>';return renderCourse();}
+  const ok=it.fix==='formula'?(normF(IS.typed).toLowerCase()===normF(it.ans).toLowerCase()):(normName(IS.typed)===normName(it.ans));
+  if(ok){finishItem(IS.diagStar+1);IS.cls='good';IS.msg=`✓ Fixed! The correct ${it.fix} is ${it.show}. +1 ★`;}
+  else{IS.cls='bad';IS.msg=`<b>Not yet.</b> 💡 ${it.hint}`;}
+  renderCourse();
+}
+
+/* ===== events ===== */
+document.addEventListener('input',e=>{if(e.target.id==='ans'&&IS) IS.typed=e.target.value;});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.target.id!=='ans'||!IS||IS.done) return;
+  e.preventDefault(); const k=V.course.kind;
+  if(k==='build') checkFormula(); else if(k==='reverse') checkName(); else if(k==='doctor') fixIt();
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b||b.disabled) return;
+  const a=b.dataset.act, v=b.dataset.v;
+  switch(a){
+    case 'menu': V.confirmReset=false; renderMenu(); break;
+    case 'toolkit': renderToolkit(); break;
+    case 'open': openCourse(v); break;
+    case 'next': nextItem(); break;
+    case 'reset': V.confirmReset=true; renderMenu(); break;
+    case 'resetNo': V.confirmReset=false; renderMenu(); break;
+    case 'resetYes': COURSES.forEach(c=>P[c.id]={stars:[]}); save(); V.confirmReset=false; renderMenu(); break;
+    case 'mcq': answerMcq(+v); break;
+    case 'pc': pickC(v); break;
+    case 'pa': pickA(v); break;
+    case 'cross': crossIt(v); break;
+    case 'simp': simplify(v); break;
+    case 'checkF': checkFormula(); break;
+    case 'rev': revTap(v); break;
+    case 'fac': revFac(+v); break;
+    case 'roman': revRoman(v); break;
+    case 'checkN': checkName(); break;
+    case 'diag': diagnose(+v); break;
+    case 'fix': fixIt(); break;
+  }
+});
+const h=(location.hash||'').slice(1);
+if(h==='toolkit') renderToolkit(); else if(COURSES.some(c=>c.id===h)) openCourse(h); else renderMenu();
+setStars();
+</script>
+
+</html>
