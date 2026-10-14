@@ -119,6 +119,18 @@ button.slot{font-family:'IBM Plex Mono',monospace;line-height:1.2}
 .bullets{padding-left:20px}
 .bullets li{margin-bottom:8px}
 .fuq{min-width:0}
+header.top{max-width:960px;margin:0 auto 14px;padding:14px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.resbtn{min-height:44px;padding:8px 16px;border-radius:12px;border:0;background:var(--navy);color:#fff;font:700 15px Poppins,sans-serif;cursor:pointer}
+.rc{background:var(--card);border:2px solid var(--navy);border-radius:16px;padding:18px;max-width:560px;margin:0 auto;display:grid;gap:10px}
+.rc h3{font-size:20px}
+.rc .who{display:flex;flex-wrap:wrap;gap:4px 18px}
+.rc table{width:100%;border-collapse:collapse;font-size:15px}
+.rc th,.rc td{text-align:left;padding:6px;border-bottom:1px solid var(--line)}
+.rc .n{text-align:center;font-family:'IBM Plex Mono',monospace}
+.rc .tot{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--gold);font-size:20px}
+.rc .stamp{font-size:13px;color:var(--muted);margin:0}
+.idrow{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 14px}
+.idrow label{display:grid;gap:4px;font-weight:700;flex:1 1 200px;min-width:0}
 [hidden]{display:none!important}
 @media (max-width:520px){
   .lbl{min-width:100%;padding-top:0}
@@ -137,11 +149,12 @@ button.slot{font-family:'IBM Plex Mono',monospace;line-height:1.2}
 
 <header class="top">
   <div class="brand">Ion Name Lab<small>Criss-cross the charges, then write the formula and the name</small></div>
-  <nav id="dots" aria-label="Missions"></nav>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><nav id="dots" aria-label="Missions"></nav><button class="resbtn" data-act="results">My results</button></div>
 </header>
 
 <main class="wrap">
   <div id="stage"></div>
+  <section id="results" class="mission" hidden></section>
 </main>
 
 <script>
@@ -410,6 +423,12 @@ function saveDone(a){try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){}
 let done=loadDone();
 let current=0, predicted=null, selPred=null;
 let fuStep=0, fuMsg='', fuHint='';
+/* results card data (this device only) */
+const SKEY='ion-name-lab-stats-v1';
+let ST; try{ST=JSON.parse(localStorage.getItem(SKEY))||{};}catch(e){ST={};}
+if(!ST.m||typeof ST.m!=='object') ST.m={}; if(typeof ST.name!=='string') ST.name=''; if(typeof ST.cls!=='string') ST.cls='';
+function saveST(){try{localStorage.setItem(SKEY,JSON.stringify(ST));}catch(e){}}
+let curWrong=0;
 const stage=document.getElementById('stage');
 const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -431,7 +450,7 @@ function renderMission(i){
   currentLab=m.lab;
   S=freshState();
   tickedCount=0; predicted=null; selPred=null;
-  fuStep=0; fuMsg=''; fuHint='';
+  fuStep=0; fuMsg=''; fuHint=''; curWrong=0;
   stage.innerHTML=`
   <article class="mission">
     <p class="kicker">Mission ${i+1} of ${MISSIONS.length}</p>
@@ -479,6 +498,7 @@ function renderSummary(){
       <li>For the same central atom, the -ate ion has one more oxygen than the -ite ion.</li>
     </ul>
     <p class="note">📘 Check your notes under <b>Naming ionic compounds with polyatomic ions</b> and match each mission to its section.</p>
+    <p><button class="resbtn" data-act="results">My results card</button></p>
     <div class="step">
       <h3>Free exploration</h3>
       <p class="intro">The lab is open. Pick any two ions, criss-cross them, and write the formula and name.</p>
@@ -642,7 +662,7 @@ function checkFormula(){
     S.formulaOK=true; S.fCls='good';
     S.fMsg='✓ Correct! The formula is '+expectedFormulaDisplay(c,a)+'.';
   } else {
-    S.formulaOK=false; S.fCls='bad';
+    S.formulaOK=false; S.fCls='bad'; curWrong++;
     const k=expectedCounts(c,a);
     const unred=normFormula((function(){const p=(ion,n)=>{if(!n)return '';const sp=plainSub(ion.sym);return (ion.poly&&n>1)?'('+sp+')'+n:sp+(n>1?n:'');};return p(c,Math.abs(a.q))+p(a,Math.abs(c.q));})());
     let hint;
@@ -669,7 +689,7 @@ function checkName(){
     S.nameOK=true; S.nCls='good';
     S.nMsg='✓ Correct! The name is '+expectedName(c,a)+'.';
   } else {
-    S.nameOK=false; S.nCls='bad';
+    S.nameOK=false; S.nCls='bad'; curWrong++;
     let hint;
     if(/\b(di|tri|tetra|mono)/.test(normName(txt))) hint='Ionic names do not use number prefixes like di- or tri-.';
     else if(/ide\b/.test(normName(txt)) && a.poly) hint='The negative ion is a polyatomic ion, so its name ends in -ate or -ite, not -ide.';
@@ -716,7 +736,7 @@ function answerFU(k){
     fuStep++; fuHint='';
     fuMsg = fuStep<m.follow.length ? '✓ Correct! Next question:' : '✓ Correct! Here is the science.';
   } else {
-    fuHint=q.hint; fuMsg='';
+    fuHint=q.hint; fuMsg=''; curWrong++;
   }
   renderFU();
 }
@@ -823,6 +843,8 @@ document.addEventListener('click', e=>{
   const b=e.target.closest('[data-act]');
   if(!b||b.disabled) return;
   const a=b.dataset.act, v=b.dataset.v;
+  if(a==='results'){showResults();return;}
+  if(a==='closeres'){hideResults();return;}
   if(a==='predict'){
     if(predicted!==null) return;
     selPred=+v;
@@ -861,6 +883,7 @@ document.addEventListener('click', e=>{
   }
   else if(a==='fu'){answerFU(+v);}
   else if(a==='next'){
+    ST.m[current]={pred:predicted===MISSIONS[current].predict.correct, wrong:curWrong}; saveST();
     markDone(current);
     if(current<MISSIONS.length-1) renderMission(current+1); else renderSummary();
   }
@@ -873,6 +896,37 @@ document.addEventListener('keydown', e=>{
   if(e.key!=='Enter') return;
   if(e.target.id==='inF'){e.preventDefault(); checkFormula();}
   else if(e.target.id==='inN'){e.preventDefault(); checkName();}
+});
+
+/* ---------- Results card ---------- */
+function escH(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function cardHTML(){
+  const now=new Date();
+  const stamp=now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  let nd=0,np=0;
+  const rows=MISSIONS.map((m,i)=>{const r=ST.m[i], d=done.includes(i)&&r; if(d){nd++; if(r.pred) np++;}
+    return `<tr><td>${i+1}. ${m.title}</td><td class="n">${d?'✓':'—'}</td><td class="n">${d?(r.pred?'✓':'✗'):'—'}</td><td class="n">${d?r.wrong:'—'}</td></tr>`;}).join('');
+  return `<div class="rc"><h3>Ion Name Lab · My results</h3>
+    <div class="who"><span>Name: <b>${escH(ST.name)||'________'}</b></span><span>Class: <b>${escH(ST.cls)||'____'}</b></span></div>
+    <table><thead><tr><th>Mission</th><th class="n">Done</th><th class="n">Prediction</th><th class="n">Extra tries</th></tr></thead><tbody>${rows}</tbody></table>
+    <p style="margin:0">Missions done: <span class="tot">${nd} / ${MISSIONS.length}</span> &nbsp;·&nbsp; predictions right: <b>${np}</b></p>
+    <p class="stamp">Made on ${stamp}. “Extra tries” = wrong answers before the right one.</p></div>`;
+}
+function showResults(){
+  const r=document.getElementById('results');
+  r.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>My results card</h2><button class="btn ghost" data-act="closeres">← Back to the lab</button></div>
+    <p class="intro">Type your name and class. Then take a screenshot of the card and post it on Toddle.</p>
+    <div class="idrow"><label for="resName">Name<input id="resName" class="ans" autocomplete="off" maxlength="40" placeholder="First and last name"></label>
+    <label for="resClass">Class<input id="resClass" class="ans" autocomplete="off" maxlength="12" placeholder="for example 9B"></label></div>
+    <div id="cardWrap">${cardHTML()}</div>`;
+  document.getElementById('resName').value=ST.name; document.getElementById('resClass').value=ST.cls;
+  document.getElementById('stage').hidden=true; r.hidden=false; window.scrollTo(0,0);
+}
+function hideResults(){document.getElementById('results').hidden=true; document.getElementById('stage').hidden=false; window.scrollTo(0,0);}
+document.addEventListener('input',e=>{
+  if(e.target.id!=='resName'&&e.target.id!=='resClass') return;
+  ST[e.target.id==='resName'?'name':'cls']=e.target.value.trim(); saveST();
+  document.getElementById('cardWrap').innerHTML=cardHTML();
 });
 
 /* ---------- Start ---------- */
