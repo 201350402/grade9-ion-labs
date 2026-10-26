@@ -176,75 +176,35 @@ const MISSIONS=[
  predict:{q:"CO and CO₂ are made of the same two elements. Will they have the same name?",opts:["Yes. Same elements, same name.","No. The name changes when the number of atoms changes.","Only the formula changes, not the name."],ans:1},
  steps:[
   {text:"First element: choose <b>C · carbon</b>.",short:"First element: choose C · carbon.",check:s=>s.a==='C'},
-  {text:"Second element: choose <b>O · oxygen</b>. Keep 1 atom of each.",short:"Second element: choose O · oxygen.",check:is('C','O',1,1)},
-  {text:"Read the name. Then press <b>+</b> once for oxygen, so there are <b>2</b> oxygen atoms.",short:"Press + once for oxygen (2 oxygen atoms).",check:is('C','O',1,2)},
-  {text:"Look at “Names you built”. Compare the two names. What changed?",short:"Compare the two names you built.",manual:true}],
+  {text:"Second element: choose <b>O · oxygen</b>. Read the name.",short:"Second element: choose O · oxygen. Read the name.",check:is('C','O',1,1)},
+  {text:"Press <b>+</b> once for oxygen (2 oxygen atoms). Compare the two names in “Names you built”.",short:"Press + once for oxygen. Compare the two names.",check:is('C','O',1,2)}],
  follow:[
   {q:"What does the prefix <b>di-</b> mean?",opts:["one","two","three","four"],ans:1,hints:["Mono- means one. Look at CO₂: how many oxygen atoms?",,"Tri- means three. Count the oxygen atoms in CO₂.","Tetra- means four. Count the oxygen atoms in CO₂."]},
-  {q:"CO is carbon <b>mon</b>oxide. What does <b>mono-</b> mean?",opts:["one","two","many","none"],ans:0,hints:[,"Di- means two. CO has only 1 oxygen atom.","Count the oxygen atoms in CO.","There is an oxygen atom in CO. How many?"]}],
- explain:"CO and CO₂ are <b>covalent compounds</b>: two non-metals that share electrons. In the name, a <b>prefix</b> counts the atoms. Carbon <b>mon</b>oxide (CO) has 1 oxygen atom. Carbon <b>di</b>oxide (CO₂) has 2. One extra atom makes a totally different gas, so the name must show it."},
+  {q:"CO is called <b>carbon</b> monoxide, not “monocarbon monoxide”. Which rule does this show?",opts:["Never put mono- on the first element","Never put mono- on the second element","Never use prefixes"],ans:0,hints:[,"Look again: carbon MONoxide. The second element has mono-.","Monoxide and dioxide are prefixes, so we do use them."]}],
+ explain:"CO and CO₂ are <b>covalent compounds</b>: two non-metals that share electrons. A <b>prefix</b> counts the atoms: carbon <b>mon</b>oxide (1 oxygen), carbon <b>di</b>oxide (2 oxygen). If there is only one atom of the <b>first</b> element, we leave out mono-."},
 {title:"Counting with prefixes",
- intro:"Every covalent name counts its atoms with a Greek prefix: mono, di, tri, tetra, penta, hexa, hepta, octa, nona, deca. Open the <b>Prefix table</b> in the lab if you need it.",
+ intro:"Every covalent name counts its atoms with a prefix: mono 1, di 2, tri 3, tetra 4, penta 5, hexa 6, hepta 7, octa 8, nona 9, deca 10. Open the <b>Prefix table</b> in the lab if you need it.",
  predict:{q:"A molecule has <b>4</b> oxygen atoms. Which prefix will the name use for oxygen?",opts:["di-","tri-","tetra-","penta-"],ans:2},
  steps:[
-  {text:"First element: choose <b>N · nitrogen</b>.",short:"First element: choose N · nitrogen.",check:s=>s.a==='N'},
-  {text:"Second element: choose <b>O · oxygen</b>.",short:"Second element: choose O · oxygen.",check:is('N','O')},
+  {text:"First element <b>N · nitrogen</b>, second element <b>O · oxygen</b>.",short:"First element N, second element O.",check:is('N','O')},
   {text:"Make <b>2</b> nitrogen atoms.",short:"Make 2 nitrogen atoms.",check:is('N','O',2)},
-  {text:"Make <b>4</b> oxygen atoms.",short:"Make 4 oxygen atoms.",check:is('N','O',2,4)}],
+  {text:"Make <b>4</b> oxygen atoms. Read the name and the yellow notes.",short:"Make 4 oxygen atoms. Read the name and notes.",check:is('N','O',2,4)}],
  follow:[
-  {q:"Which prefix means <b>5</b>?",opts:["tetra-","penta-","hexa-","deca-"],ans:1,hints:["Tetra- means 4.",,"Hexa- means 6.","Deca- means 10."]},
-  {q:"PCl₅ has 1 phosphorus atom and 5 chlorine atoms. Its name is…",opts:["phosphorus pentachloride","monophosphorus pentachloride","phosphorus tetrachloride","pentaphosphorus chloride"],ans:0,hints:[,"Close! But we never put mono- on the first element.","Tetra- means 4. PCl₅ has 5 chlorine atoms.","The 5 belongs to chlorine, not phosphorus."]}],
- explain:"N₂O₄ is <b>di</b>nitrogen <b>tetr</b>oxide: 2 nitrogen atoms and 4 oxygen atoms. The second element always gets a prefix and its ending changes to <b>-ide</b> (oxygen → oxide, chlorine → chloride)."},
-{title:"When is mono- left out?",
- intro:"Prefixes are useful, but chemists don't like extra words. There is one place where <b>mono-</b> is never written.",
- predict:{q:"CO has only one carbon atom. Does its name start with “monocarbon”?",opts:["Yes: monocarbon monoxide","No: just carbon monoxide","No: just carbon oxide"],ans:1},
- steps:[
-  {text:"First element: choose <b>N · nitrogen</b>.",short:"First element: choose N · nitrogen.",check:s=>s.a==='N'},
-  {text:"Second element: choose <b>O · oxygen</b>.",short:"Second element: choose O · oxygen.",check:is('N','O',1)},
-  {text:"Make <b>2</b> oxygen atoms. Keep 1 nitrogen atom.",short:"Make 2 oxygen atoms (1 nitrogen).",check:is('N','O',1,2)},
-  {text:"Read the yellow notes. Find the rule about <b>mono-</b>.",short:"Find the rule about mono- in the yellow notes.",manual:true}],
- follow:[
-  {q:"NO₂ is called…",opts:["mononitrogen dioxide","nitrogen dioxide","nitrogen oxide","dinitrogen oxide"],ans:1,hints:["Never put mono- on the first element.",,"The 2 oxygen atoms need the prefix di-.","There is only 1 nitrogen, and 2 oxygen."]},
-  {q:"Where can <b>mono-</b> be used?",opts:["On the first element only","On the second element only","On both elements","Never"],ans:1,hints:["The opposite! The first element never gets mono-.",,"Look at carbon monoxide: is there a “mono” before carbon?","Carbon monoxide has mono- in it. Where?"]}],
- explain:"If there is <b>only one atom of the first element</b>, we leave out mono-: CO is <b>carbon</b> monoxide, NO₂ is <b>nitrogen</b> dioxide. The second element <b>always</b> has a prefix, even mono-."},
-{title:"The vowel drop",
- intro:"Say “penta-oxide” quickly. Two vowels bump into each other! Chemists make the name easier to say.",
- predict:{q:"Penta- + oxide. How is it written in a name?",opts:["pentaoxide","pentoxide","pentoxid"],ans:1},
- steps:[
-  {text:"Build nitrogen and oxygen: first <b>N</b>, second <b>O</b>.",short:"First element N, second element O.",check:is('N','O')},
-  {text:"Make <b>2</b> nitrogen atoms.",short:"Make 2 nitrogen atoms.",check:is('N','O',2)},
-  {text:"Make <b>5</b> oxygen atoms.",short:"Make 5 oxygen atoms.",check:is('N','O',2,5)},
-  {text:"Read the name and the yellow note about the vowel.",short:"Read the name and the vowel note.",manual:true}],
- follow:[
-  {q:"Which name is written correctly?",opts:["carbon monooxide","carbon monoxide","carbon mooxide"],ans:1,hints:["Two o's together: one o is dropped.",,"Only the last vowel of the prefix is dropped: mon + oxide."]},
-  {q:"Is a vowel dropped in <b>di- + oxide</b>?",opts:["Yes: doxide","No: dioxide. Only a or o is dropped."],ans:1,hints:["Di- ends in i, not a or o. We keep it."]}],
- explain:"When the prefix ends in <b>a</b> or <b>o</b> and the next word starts with <b>o</b> (oxide), drop the a or o: mon<b>o</b>xide, tetr<b>o</b>xide, pent<b>o</b>xide. Di- and tri- keep their <b>i</b>: dioxide, trioxide. N₂O₅ is <b>dinitrogen pentoxide</b>."},
+  {q:"PCl₅ has 1 phosphorus atom and 5 chlorine atoms. Its name is…",opts:["phosphorus pentachloride","monophosphorus pentachloride","phosphorus tetrachloride","pentaphosphorus chloride"],ans:0,hints:[,"Close! But we never put mono- on the first element.","Tetra- means 4. PCl₅ has 5 chlorine atoms.","The 5 belongs to chlorine, not phosphorus."]},
+  {q:"Which name is spelled correctly?",opts:["dinitrogen tetraoxide","dinitrogen tetroxide","dinitrogen tetroxid"],ans:1,hints:["Before “oxide”, the a of tetra is dropped.",,"The ending is -ide: oxide."]}],
+ explain:"N₂O₄ is <b>di</b>nitrogen <b>tetr</b>oxide. The second element ends in <b>-ide</b> (oxygen → oxide, chlorine → chloride). Before “oxide”, drop the <b>a</b> or <b>o</b> of the prefix: monoxide, tetroxide, pentoxide. Di- and tri- keep their i: dioxide."},
 {title:"Ionic or covalent?",
  intro:"Not every compound uses prefixes. Table salt from the Gulf is <b>sodium chloride</b>, not “monosodium monochloride”. Why?",
  predict:{q:"Sodium chloride (NaCl) is a metal + a non-metal. Will its name use prefixes?",opts:["Yes: monosodium monochloride","No: ionic names never use prefixes","Only on chlorine: sodium monochloride"],ans:1},
  steps:[
   {text:"First element: choose <b>Na · sodium</b> (a metal).",short:"First element: choose Na · sodium.",check:s=>s.a==='Na'},
-  {text:"Second element: choose <b>Cl · chlorine</b>.",short:"Second element: choose Cl · chlorine.",check:is('Na','Cl',1,1)},
-  {text:"Read the <b>Type</b> card and the yellow note.",short:"Read the Type card and the note.",manual:true},
+  {text:"Second element: choose <b>Cl · chlorine</b>. Read the Type card.",short:"Second element: choose Cl. Read the Type card.",check:is('Na','Cl',1,1)},
   {text:"Change the first element to <b>N · nitrogen</b> and make <b>3</b> chlorine atoms.",short:"Change to N · nitrogen, then make 3 chlorine atoms.",check:is('N','Cl',1,3)}],
  follow:[
-  {q:"Which compound needs prefixes in its name?",opts:["MgO","SCl₂","KBr","CaCl₂"],ans:1,hints:["Mg is a metal, so MgO is ionic: magnesium oxide.",,"K is a metal, so KBr is ionic: potassium bromide.","Ca is a metal, so CaCl₂ is ionic: calcium chloride."]},
-  {q:"How can you tell a compound is covalent?",opts:["It contains a metal","It is made of two non-metals","It has a big formula","It dissolves in water"],ans:1,hints:["A metal + a non-metal makes an ionic compound.",,"Size doesn't matter. Look at the type of elements.","Many ionic and covalent compounds dissolve. Look at the elements."]}],
- explain:"<b>Metal + non-metal = ionic.</b> The charges decide the formula, so the name needs no prefixes: sodium chloride. <b>Non-metal + non-metal = covalent.</b> Atoms can join in different numbers (NO, NO₂, N₂O₄…), so the prefixes tell us which one: NCl₃ is nitrogen <b>tri</b>chloride."},
-{title:"Special names",
- intro:"Some covalent compounds are so common that everybody uses their old name. You drink one every day and the UAE's gas fields are full of another.",
- predict:{q:"By the rules, H₂O is “dihydrogen monoxide”. What do chemists actually call it?",opts:["dihydrogen monoxide","water","hydrogen oxide"],ans:1},
- steps:[
-  {text:"First element <b>H · hydrogen</b>, second element <b>O · oxygen</b>.",short:"First element H, second element O.",check:is('H','O')},
-  {text:"Make <b>2</b> hydrogen atoms and <b>1</b> oxygen atom.",short:"Make 2 hydrogen atoms, 1 oxygen atom.",check:is('H','O',2,1)},
-  {text:"Now choose <b>N · nitrogen</b> first and <b>H · hydrogen</b> second.",short:"First element N, second element H.",check:is('N','H')},
-  {text:"Make <b>1</b> nitrogen atom and <b>3</b> hydrogen atoms.",short:"Make 1 nitrogen, 3 hydrogen atoms.",check:is('N','H',1,3)}],
- follow:[
-  {q:"NH₃ is known as…",opts:["methane","ammonia","water","nitrogen trihydrogen"],ans:1,hints:["Methane is CH₄.",,"Water is H₂O.","The second element ends in -ide, and NH₃ has a common name."]},
-  {q:"CH₄, the natural gas from UAE gas fields, is called…",opts:["methane","ammonia","carbon dioxide","water"],ans:0,hints:[,"Ammonia is NH₃.","Carbon dioxide is CO₂.","Water is H₂O."]}],
- explain:"Learn these three by heart: <b>H₂O = water</b>, <b>NH₃ = ammonia</b>, <b>CH₄ = methane</b>. They are covalent, but we always use their common names."}
+  {q:"Which compound needs prefixes in its name?",opts:["MgO","SCl₂","KBr","CaCl₂"],ans:1,hints:["Mg is a metal, so MgO is ionic: magnesium oxide.",,"K is a metal, so KBr is ionic: potassium bromide.","Ca is a metal, so CaCl₂ is ionic: calcium chloride."]}],
+ explain:"<b>Metal + non-metal = ionic.</b> The charges decide the formula, so the name needs no prefixes: sodium chloride. <b>Non-metal + non-metal = covalent.</b> Atoms can join in different numbers, so prefixes show which one: NCl₃ is nitrogen <b>tri</b>chloride."}
 ];
-const SUMMARY=["A covalent compound is made of <b>two non-metals</b> that share electrons.","Prefixes count the atoms: mono 1, di 2, tri 3, tetra 4, penta 5, hexa 6, hepta 7, octa 8, nona 9, deca 10.","The second element ends in <b>-ide</b> and always has a prefix. Never put mono- on the first element.","Drop the a or o of the prefix before <b>oxide</b>: monoxide, tetroxide, pentoxide.","Ionic compounds (metal + non-metal) <b>never</b> use prefixes. Water, ammonia and methane keep their common names."];
+const SUMMARY=["A covalent compound is made of <b>two non-metals</b> that share electrons.","Prefixes count the atoms: mono 1, di 2, tri 3, tetra 4, penta 5, hexa 6, hepta 7, octa 8, nona 9, deca 10.","Never put mono- on the first element. The second element ends in <b>-ide</b>; drop a/o before oxide.","Ionic compounds (metal + non-metal) <b>never</b> use prefixes. Water (H₂O) and ammonia (NH₃) keep their common names."];
 
 // ---------- chemistry ----------
 const EL={H:{n:'hydrogen',ide:'hydride',c:'#FFFFFF',m:0,q:-1},C:{n:'carbon',ide:'carbide',c:'#3B3F45',m:0,q:-4},N:{n:'nitrogen',ide:'nitride',c:'#2F62C8',m:0,q:-3},O:{n:'oxygen',ide:'oxide',c:'#D8392B',m:0,q:-2},
@@ -319,8 +279,8 @@ function draw(){fit();const W=cv.width/DPR,H=cv.height/DPR,t=reduce?0:performanc
 function loop(){draw();if(!reduce)requestAnimationFrame(loop);}
 // ---------- mission engine ----------
 let cur=0,freeMode=false,state=load()||{done:[],pred:{},stat:{}};
-function save(){try{localStorage.setItem('sim-'+document.title,JSON.stringify({...state,cur}));}catch(e){}}
-function load(){try{const v=JSON.parse(localStorage.getItem('sim-'+document.title)||'null');if(v){cur=Math.min(v.cur||0,MISSIONS.length-1);}return v;}catch(e){return null;}}
+function save(){try{localStorage.setItem('sim3-'+document.title,JSON.stringify({...state,cur}));}catch(e){}}
+function load(){try{const v=JSON.parse(localStorage.getItem('sim3-'+document.title)||'null');if(v){cur=Math.min(v.cur||0,MISSIONS.length-1);}return v;}catch(e){return null;}}
 let pred=null,locked=false,stepI=0,ticked=[],fqI=0;
 function dots(){$('dots').innerHTML=MISSIONS.map((m,i)=>`<button class="dot ${i===cur&&!freeMode?'cur':''} ${state.done.includes(i)?'done':''}" ${i<=Math.max(cur,...state.done.map(x=>x+1),0)?'':'disabled'} data-i="${i}" aria-label="Mission ${i+1}">${i+1}</button>`).join('')+`<button class="pill" id="goRes">★ Results</button>`;
  [...$('dots').querySelectorAll('.dot')].forEach(b=>b.onclick=()=>openMission(+b.dataset.i));$('goRes').onclick=()=>$('resCard').scrollIntoView({behavior:reduce?'auto':'smooth'});}

@@ -177,75 +177,36 @@ const MISSIONS=[
  intro:"Now we go backwards: from a <b>name</b> to a <b>formula</b>. The gold card in the lab shows the name to build. It turns green when your molecule matches.",
  predict:{q:"The name is <b>dinitrogen trioxide</b>. How many oxygen atoms are in one molecule?",opts:["1","2","3","5"],ans:2},
  steps:[
-  {text:"First element: choose <b>N · nitrogen</b>.",short:"First element: choose N · nitrogen.",check:s=>s.a==='N'},
-  {text:"Second element: choose <b>O · oxygen</b>.",short:"Second element: choose O · oxygen.",check:is('N','O')},
+  {text:"First element <b>N · nitrogen</b>, second element <b>O · oxygen</b>.",short:"First element N, second element O.",check:is('N','O')},
   {text:"<b>Di</b>nitrogen: make 2 nitrogen atoms.",short:"Make 2 nitrogen atoms.",check:is('N','O',2)},
-  {text:"<b>Tri</b>oxide: make 3 oxygen atoms. Check the gold card turns ✓.",short:"Make 3 oxygen atoms.",check:is('N','O',2,3)},
-  {text:"Read the formula card. Where did the prefixes go?",short:"Read the formula. Where did the prefixes go?",manual:true}],
+  {text:"<b>Tri</b>oxide: make 3 oxygen atoms. Check the gold card turns ✓.",short:"Make 3 oxygen atoms.",check:is('N','O',2,3)}],
  follow:[
-  {q:"The formula for dinitrogen trioxide is…",opts:["N₂O₃","N₃O₂","NO₃","N₂O"],ans:0,hints:[,"The numbers are the wrong way round. Di- goes with nitrogen.","Di- means there are 2 nitrogen atoms.","Tri- means there are 3 oxygen atoms."]},
-  {q:"In a covalent name, the prefixes become the…",opts:["charges","subscripts (small numbers)","mass numbers","big numbers in front"],ans:1,hints:["Covalent compounds have no ions, so no charges.",,"Mass numbers are about protons and neutrons, not names.","Big numbers in front are for equations, not formulas."]}],
- explain:"Each prefix becomes a <b>subscript</b>, the small number after the symbol: <b>di</b>nitrogen <b>tri</b>oxide → N<b>₂</b>O<b>₃</b>. The number 1 is never written in a formula."},
-{title:"No prefix means one",
- target:T('carbon tetrachloride','C','Cl',1,4),
- intro:"Carbon tetrachloride was used in old fire extinguishers. Now it is banned because it harms the ozone layer.",
- predict:{q:"<b>Carbon</b> tetrachloride has no prefix before carbon. How many carbon atoms?",opts:["0","1","4","You can't tell"],ans:1},
+  {q:"In a covalent name, the prefixes become the…",opts:["charges","subscripts (small numbers)","mass numbers","big numbers in front"],ans:1,hints:["Covalent compounds have no ions, so no charges.",,"Mass numbers are about protons and neutrons, not names.","Big numbers in front are for equations, not formulas."]},
+  {q:"<b>Carbon</b> tetrachloride has no prefix before carbon. Its formula is…",opts:["CCl₄","C₄Cl","CCl","C₂Cl₄"],ans:0,hints:[,"Tetra- goes with chloride, not carbon.","Tetra- means 4 chlorine atoms.","No prefix on the first element means just 1 atom."]}],
+ explain:"Each prefix becomes a <b>subscript</b>: <b>di</b>nitrogen <b>tri</b>oxide → N<b>₂</b>O<b>₃</b>. No prefix on the first element means <b>1 atom</b>, and the 1 is never written: carbon tetrachloride = CCl₄."},
+{title:"UAE sulfur: don't criss-cross!",
+ target:T('sulfur trioxide','S','O',1,3),
+ intro:"The <b>Shah gas plant</b> in Abu Dhabi takes about <b>4.2 million tonnes</b> of sulfur a year out of natural gas, around 5% of the world's sulfur. Much of it becomes sulfur dioxide and sulfur trioxide, used to make sulfuric acid.",
+ predict:{q:"How do you find the formula of <b>sulfur trioxide</b>?",opts:["Criss-cross the charges of S and O","Read the prefixes in the name","Use the group numbers"],ans:1},
  steps:[
-  {text:"First element: choose <b>C · carbon</b>.",short:"First element: choose C · carbon.",check:s=>s.a==='C'},
-  {text:"Second element: choose <b>Cl · chlorine</b>.",short:"Second element: choose Cl · chlorine.",check:is('C','Cl')},
-  {text:"<b>Tetra</b>chloride: make 4 chlorine atoms. Keep 1 carbon.",short:"Make 4 chlorine atoms (1 carbon).",check:is('C','Cl',1,4)}],
+  {text:"First element <b>S · sulfur</b>, second element <b>O · oxygen</b>.",short:"First element S, second element O.",check:is('S','O')},
+  {text:"<b>Tri</b>oxide: make the right number of oxygen atoms.",short:"Use tri- to set the oxygen atoms.",check:is('S','O',1,3)}],
  follow:[
-  {q:"Write the formula for <b>sulfur hexafluoride</b>.",opts:["SF₆","S₆F","SF₅","S₂F₆"],ans:0,hints:[,"Hexa- goes with fluoride, not sulfur.","Hexa- means 6, not 5.","There is no prefix before sulfur, so there is 1 sulfur."]}],
- explain:"No prefix on the first element means <b>1 atom</b>: carbon tetrachloride = CCl₄, sulfur hexafluoride = SF₆."},
-{title:"Don't criss-cross!",
- target:T('sulfur dioxide','S','O',1,2),
- intro:"For ionic compounds you swap the charges (criss-cross). Covalent compounds are different: their atoms share electrons and have <b>no charges</b>.",
- predict:{q:"How do you find the formula of <b>sulfur dioxide</b>?",opts:["Criss-cross the charges of S and O","Read the prefixes in the name","Use the group numbers"],ans:1},
- steps:[
-  {text:"First element: choose <b>S · sulfur</b>.",short:"First element: choose S · sulfur.",check:s=>s.a==='S'},
-  {text:"Second element: choose <b>O · oxygen</b>.",short:"Second element: choose O · oxygen.",check:is('S','O')},
-  {text:"Read the prefix <b>di-</b> and make the right number of oxygen atoms.",short:"Use the prefix di- to set the oxygen atoms.",check:is('S','O',1,2)}],
- follow:[
-  {q:"<b>Dinitrogen monoxide</b> (laughing gas, used by dentists) is…",opts:["N₂O","NO₂","N₂O₂","NO"],ans:0,hints:[,"Di- goes with nitrogen, mono- goes with oxygen.","Mono- means only 1 oxygen.","Di- means 2 nitrogen atoms."]}],
- explain:"Covalent formula = read the prefixes. Sulfur <b>di</b>oxide = SO<b>₂</b>. If you criss-cross charges for a covalent compound you will get the wrong formula, because the atoms are <b>not ions</b>."},
+  {q:"<b>Sulfur dioxide</b> is…",opts:["SO₂","S₂O","SO","S₂O₂"],ans:0,hints:[,"Di- goes with oxygen, not sulfur.","Di- means 2 oxygen atoms.","There is no prefix before sulfur, so there is 1 sulfur."]}],
+ explain:"Covalent formula = <b>read the prefixes</b>: sulfur <b>tri</b>oxide = SO₃, sulfur <b>di</b>oxide = SO₂. Never criss-cross charges for covalent compounds: the atoms share electrons and are <b>not ions</b>."},
 {title:"Ionic or covalent rule?",
  target:T('magnesium chloride','Mg','Cl',1,2),
  intro:"Before you write any formula, ask one question: <b>is the first element a metal?</b>",
  predict:{q:"<b>Magnesium chloride</b> has no prefixes. How will you know how many chlorine atoms?",opts:["There is 1 chlorine because there is no prefix","Mg is a metal, so balance the charges: Mg²⁺ and Cl⁻","You can't know"],ans:1},
  steps:[
-  {text:"First element: choose <b>Mg · magnesium</b> (a metal).",short:"First element: choose Mg · magnesium.",check:s=>s.a==='Mg'},
-  {text:"Second element: choose <b>Cl · chlorine</b>. Read the red note.",short:"Second element: choose Cl, then read the red note.",check:is('Mg','Cl')},
+  {text:"First element <b>Mg · magnesium</b> (a metal), second element <b>Cl · chlorine</b>. Read the red note.",short:"First element Mg, second element Cl. Read the red note.",check:is('Mg','Cl')},
   {text:"Change chlorine until the charges balance and the gold card shows ✓.",short:"Change chlorine until the charges balance.",check:is('Mg','Cl',1,2)},
   {text:"Now build <b>sulfur dichloride</b>: change the first element to <b>S · sulfur</b>.",short:"Change the first element to S · sulfur.",check:is('S','Cl',1,2),target:T('sulfur dichloride','S','Cl',1,2)}],
  follow:[
-  {q:"Which name is <b>wrong</b>?",opts:["magnesium chloride","magnesium dichloride","sulfur dichloride","carbon dioxide"],ans:1,hints:["This one is right: ionic, no prefixes.",,"This one is right: two non-metals, so prefixes.","This one is right: two non-metals, so prefixes."]},
-  {q:"Calcium bromide (Ca²⁺ and Br⁻) is…",opts:["CaBr₂","CaBr","Ca₂Br","CaBr₃"],ans:0,hints:[,"Ca²⁺ needs two Br⁻ to balance.","This gives 4+ and 1−. It doesn't balance.","This gives 2+ and 3−. It doesn't balance."]}],
- explain:"MgCl₂ and SCl₂ look alike, but they follow different rules. <b>Metal first → ionic:</b> balance the charges, no prefixes (magnesium chloride). <b>Non-metal first → covalent:</b> read the prefixes (sulfur <b>di</b>chloride)."},
-{title:"UAE sulfur",
- target:T('sulfur trioxide','S','O',1,3),
- intro:"The <b>Shah gas plant</b> in Abu Dhabi takes sulfur out of natural gas: about <b>4.2 million tonnes</b> a year, around 5% of the world's sulfur. Trains carry it to Ruwais for export. Much of it becomes sulfuric acid, made from sulfur dioxide and sulfur trioxide.",
- predict:{q:"<b>Sulfur trioxide</b>: how many atoms are in one molecule in total?",opts:["2","3","4","6"],ans:2},
- steps:[
-  {text:"First element <b>S · sulfur</b>, second element <b>O · oxygen</b>.",short:"First element S, second element O.",check:is('S','O')},
-  {text:"<b>Tri</b>oxide: make the right number of oxygen atoms.",short:"Use tri- to set the oxygen atoms.",check:is('S','O',1,3)},
-  {text:"Count all the atoms in the model.",short:"Count all the atoms in the model.",manual:true}],
- follow:[
-  {q:"SO₂ is called…",opts:["sulfur dioxide","monosulfur dioxide","sulfur oxide","disulfur oxide"],ans:0,hints:[,"Never mono- on the first element.","The 2 oxygen atoms need a prefix.","There is only 1 sulfur atom."]}],
- explain:"Sulfur trioxide = SO₃: 1 sulfur + 3 oxygen = <b>4 atoms</b>. Sulfur dioxide = SO₂. One extra oxygen atom, a different compound, a different name."},
-{title:"Big numbers",
- target:T('diphosphorus pentoxide','P','O',2,5),
- intro:"Diphosphorus pentoxide is a white powder that pulls water out of the air. Labs use it to keep things very dry.",
- predict:{q:"“Pent<b>oxide</b>” lost its letter a. Does that change the number of oxygen atoms?",opts:["No. Pent- still means 5.","Yes. Pent- means 4.","Yes. Pent- means 6."],ans:0},
- steps:[
-  {text:"First element <b>P · phosphorus</b>, second element <b>O · oxygen</b>.",short:"First element P, second element O.",check:is('P','O')},
-  {text:"<b>Di</b>phosphorus: make 2 phosphorus atoms.",short:"Make 2 phosphorus atoms.",check:is('P','O',2)},
-  {text:"<b>Pent</b>oxide: make 5 oxygen atoms.",short:"Make 5 oxygen atoms.",check:is('P','O',2,5)}],
- follow:[
-  {q:"Write the formula for <b>dinitrogen pentoxide</b>.",opts:["N₂O₅","N₅O₂","N₂O₄","NO₅"],ans:0,hints:[,"Di- goes with nitrogen and pent- with oxygen.","Pent- means 5, not 4.","Di- means 2 nitrogen atoms."]},
-  {q:"Challenge: <b>tetraphosphorus decoxide</b> is…",opts:["P₄O₁₀","P₁₀O₄","P₄O₈","PO₁₀"],ans:0,hints:[,"Tetra- goes with phosphorus, dec- with oxygen.","Dec(a)- means 10.","Tetra- means 4 phosphorus atoms."]}],
- explain:"The vowel drop only changes the <b>spelling</b>, not the number: pent(a)oxide = 5 oxygen atoms. Diphosphorus pentoxide = P₂O₅. Its real molecule is P₄O₁₀ (tetraphosphorus decoxide)."}
+  {q:"Which name is <b>wrong</b>?",opts:["magnesium chloride","magnesium dichloride","sulfur dichloride","carbon dioxide"],ans:1,hints:["This one is right: ionic, no prefixes.",,"This one is right: two non-metals, so prefixes.","This one is right: two non-metals, so prefixes."]}],
+ explain:"MgCl₂ and SCl₂ look alike, but they follow different rules. <b>Metal first → ionic:</b> balance the charges, no prefixes (magnesium chloride). <b>Non-metal first → covalent:</b> read the prefixes (sulfur <b>di</b>chloride)."}
 ];
-const SUMMARY=["To write a formula, first ask: <b>is the first element a metal?</b> Yes → ionic rules. No → covalent rules.","Covalent: each prefix becomes a <b>subscript</b>: dinitrogen trioxide → N₂O₃.","No prefix on the first element means <b>1 atom</b>: carbon tetrachloride → CCl₄.","Never criss-cross charges for covalent compounds: the atoms share electrons and are not ions.","Ionic: no prefixes, so balance the charges: magnesium chloride → MgCl₂."];
+const SUMMARY=["To write a formula, first ask: <b>is the first element a metal?</b> Yes → ionic rules. No → covalent rules.","Covalent: each prefix becomes a <b>subscript</b>: dinitrogen trioxide → N₂O₃.","No prefix on the first element means <b>1 atom</b>: carbon tetrachloride → CCl₄.","Never criss-cross charges for covalent compounds. Ionic: no prefixes, so balance the charges: MgCl₂."];
 
 // ---------- chemistry ----------
 const EL={H:{n:'hydrogen',ide:'hydride',c:'#FFFFFF',m:0,q:-1},C:{n:'carbon',ide:'carbide',c:'#3B3F45',m:0,q:-4},N:{n:'nitrogen',ide:'nitride',c:'#2F62C8',m:0,q:-3},O:{n:'oxygen',ide:'oxide',c:'#D8392B',m:0,q:-2},
@@ -320,8 +281,8 @@ function draw(){fit();const W=cv.width/DPR,H=cv.height/DPR,t=reduce?0:performanc
 function loop(){draw();if(!reduce)requestAnimationFrame(loop);}
 // ---------- mission engine ----------
 let cur=0,freeMode=false,state=load()||{done:[],pred:{},stat:{}};
-function save(){try{localStorage.setItem('sim-'+document.title,JSON.stringify({...state,cur}));}catch(e){}}
-function load(){try{const v=JSON.parse(localStorage.getItem('sim-'+document.title)||'null');if(v){cur=Math.min(v.cur||0,MISSIONS.length-1);}return v;}catch(e){return null;}}
+function save(){try{localStorage.setItem('sim3-'+document.title,JSON.stringify({...state,cur}));}catch(e){}}
+function load(){try{const v=JSON.parse(localStorage.getItem('sim3-'+document.title)||'null');if(v){cur=Math.min(v.cur||0,MISSIONS.length-1);}return v;}catch(e){return null;}}
 let pred=null,locked=false,stepI=0,ticked=[],fqI=0;
 function dots(){$('dots').innerHTML=MISSIONS.map((m,i)=>`<button class="dot ${i===cur&&!freeMode?'cur':''} ${state.done.includes(i)?'done':''}" ${i<=Math.max(cur,...state.done.map(x=>x+1),0)?'':'disabled'} data-i="${i}" aria-label="Mission ${i+1}">${i+1}</button>`).join('')+`<button class="pill" id="goRes">★ Results</button>`;
  [...$('dots').querySelectorAll('.dot')].forEach(b=>b.onclick=()=>openMission(+b.dataset.i));$('goRes').onclick=()=>$('resCard').scrollIntoView({behavior:reduce?'auto':'smooth'});}
