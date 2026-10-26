@@ -1,330 +1,209 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Molecule Namer Lab</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;700&family=Poppins:wght@600;700&display=swap">
-<style>body{margin:0}
-/* Layout: one guided column — mission header, Step 1 predict, Step 2 locked lab, Step 3 follow-up */
+<style>
 :root{--bg:#F6F8FB;--surface:#FFFFFF;--ink:#1A2433;--muted:#5A6678;--line:#D9E0EA;--navy:#1E3A5F;--navy-soft:#E6EDF6;--gold:#A97F0F;--gold-soft:#F7EED6;--red:#CC4B31;--red-soft:#F9E3DD;--blue:#2D6CA2;--blue-soft:#E1ECF6;--ok:#2F7D4F;--ok-soft:#E2F2E8;
  --f-head:"Poppins","Segoe UI",system-ui,sans-serif;--f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;color-scheme:light}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0F1724;--surface:#172233;--ink:#E7EDF5;--muted:#9FB0C4;--line:#2A3B52;--navy:#8FB3DF;--navy-soft:#1C2C42;--gold:#E2B84A;--gold-soft:#2E2715;--red:#F0866D;--red-soft:#3A221C;--blue:#7DB2E3;--blue-soft:#18293D;--ok:#6FCB95;--ok-soft:#173226;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0F1724;--surface:#172233;--ink:#E7EDF5;--muted:#9FB0C4;--line:#2A3B52;--navy:#8FB3DF;--navy-soft:#1C2C42;--gold:#E2B84A;--gold-soft:#2E2715;--red:#F0866D;--red-soft:#3A221C;--blue:#7DB2E3;--blue-soft:#18293D;--ok:#6FCB95;--ok-soft:#173226;color-scheme:dark}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.55 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
-.wrap{max-width:960px;margin:0 auto;display:grid;gap:18px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.5 var(--f-body);padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:900px;margin:0 auto;display:grid;gap:16px}
 h1,h2,h3{font-family:var(--f-head);margin:0;line-height:1.2;text-wrap:balance}
-h1{font-size:clamp(1.5rem,4vw,2.1rem);color:var(--navy)}
-h2{font-size:1.25rem}h3{font-size:1.05rem}
-.top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 16px;align-items:flex-end}
-.top p{margin:4px 0 0;color:var(--muted);max-width:60ch}
-.dots{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.dot{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--surface);font:700 1rem var(--f-num);color:var(--muted);display:grid;place-items:center;cursor:pointer}
-.dot.cur{border-color:var(--navy);color:var(--navy)}.dot.done{background:var(--navy);border-color:var(--navy);color:var(--surface)}
-.dot:disabled{cursor:not-allowed;opacity:.6}
-.pill{font:700 .95rem var(--f-body);border-radius:999px;padding:10px 16px;border:2px solid var(--gold);color:var(--gold);background:var(--surface);cursor:pointer;min-height:44px}
+h1{font-size:clamp(1.5rem,4vw,2rem);color:var(--navy)}h2{font-size:1.25rem}
+.top p{margin:4px 0 0;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{font:700 .95rem var(--f-body);border:2px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:9px 14px;min-height:44px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab b{font-family:var(--f-num)}
+.tab.cur{border-color:var(--navy);color:var(--navy)}.tab.done{background:var(--navy);border-color:var(--navy);color:var(--surface)}
+.tab.res{border-color:var(--gold);color:var(--gold)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;min-width:0}
-.step-h{display:flex;gap:12px;align-items:center}
-.step-n{width:34px;height:34px;border-radius:10px;background:var(--navy);color:var(--surface);font:700 1rem var(--f-num);display:grid;place-items:center;flex:none}
-.intro{background:var(--gold-soft);border-radius:12px;padding:12px 14px;margin:0}
-.opts{display:grid;gap:10px}
-.opt{font:400 1.05rem var(--f-body);text-align:left;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;min-height:52px}
-.opt[aria-pressed="true"]{border-color:var(--navy);background:var(--navy-soft)}
-.opt.right{border-color:var(--ok);background:var(--ok-soft)}.opt.wrong{border-color:var(--red);background:var(--red-soft)}
-.opt:disabled{cursor:default}
-.btn{font:700 1.05rem var(--f-body);border-radius:12px;padding:12px 18px;border:2px solid var(--navy);background:var(--navy);color:var(--surface);cursor:pointer;min-height:52px;justify-self:start}
+.thead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center}
+.kicker{font:700 .85rem var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.do{background:var(--gold-soft);border-radius:12px;padding:12px 14px;margin:0;font-weight:700}
+.tip{background:var(--blue-soft);border-radius:12px;padding:10px 14px;margin:0}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--navy);width:0;transition:width .3s}
+.count{font:700 1rem var(--f-num);color:var(--muted)}
+.big{font:700 clamp(2.4rem,9vw,3.6rem) var(--f-num);text-align:center;line-height:1.1}
+.sub2{text-align:center;color:var(--muted);margin:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{font:700 1.05rem var(--f-body);border-radius:12px;padding:12px 18px;border:2px solid var(--navy);background:var(--navy);color:var(--surface);cursor:pointer;min-height:52px}
 .btn.ghost{background:var(--surface);color:var(--navy)}
+.btn.wide{min-width:min(100%,180px)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.locked{display:grid;place-items:center;gap:8px;text-align:center;padding:30px 16px;border:2px dashed var(--line);border-radius:14px;color:var(--muted)}
-.locked b{font:700 1.15rem var(--f-head);color:var(--ink)}
-.banner{background:var(--navy);color:var(--surface);border-radius:12px;padding:12px 14px;font-weight:700}
-.banner.done{background:var(--ok)}
-ol.instr{margin:0;padding:0;list-style:none;display:grid;gap:8px}
-ol.instr li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
-ol.instr li .tk{width:30px;height:30px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;font:700 .95rem var(--f-num);color:var(--muted)}
-ol.instr li.cur{border-color:var(--navy)}ol.instr li.cur .tk{border-color:var(--navy);color:var(--navy)}
-ol.instr li.ok{background:var(--ok-soft);border-color:transparent}ol.instr li.ok .tk{background:var(--ok);border-color:var(--ok);color:#fff}
-ol.instr li .man{margin-top:8px}
-.lab{display:grid;gap:14px}
-.pickers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media (max-width:560px){.pickers{grid-template-columns:1fr}}
-.pick{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;background:var(--bg)}
-.pick label{font-weight:700}
-select{font:500 1.05rem var(--f-body);color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:10px;min-height:48px;width:100%}
-.count{display:flex;align-items:center;gap:10px}
-.count button{width:52px;height:52px;border-radius:12px;border:2px solid var(--navy);background:var(--surface);color:var(--navy);font:700 1.6rem var(--f-num);cursor:pointer}
-.count output{font:700 1.6rem var(--f-num);min-width:2ch;text-align:center}
-.count span{color:var(--muted)}
-canvas{width:100%;height:auto;display:block;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
-.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
-.rc{border-radius:12px;padding:10px 14px;background:var(--navy-soft);display:grid;gap:2px;min-width:0}
-.rc span{font-size:.85rem;color:var(--muted)}
-.rc b{font:700 1.35rem var(--f-num);overflow-wrap:anywhere}
-.rc b.nm{font-family:var(--f-head);font-size:1.25rem}
-.rc.type-ionic{background:var(--red-soft)}.rc.type-cov{background:var(--blue-soft)}
-.notes{display:grid;gap:6px}
-.note{background:var(--gold-soft);border-left:5px solid var(--gold);border-radius:8px;padding:8px 12px}
-.note.warn{background:var(--red-soft);border-left-color:var(--red)}
-.target{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border:2px solid var(--gold);border-radius:14px;padding:12px 14px;background:var(--gold-soft)}
-.target b{font:700 1.3rem var(--f-head)}
-.match{font-weight:700;border-radius:999px;padding:6px 12px;background:var(--surface);border:2px solid var(--line)}
-.match.yes{border-color:var(--ok);color:var(--ok)}
-.hist{display:flex;flex-wrap:wrap;gap:8px}
-.hist span{font:500 .95rem var(--f-num);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
-.model{font-size:.85rem;color:var(--muted);margin:0}
-.cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-@media (max-width:560px){.cmp{grid-template-columns:1fr}}
-.cmp div{border-radius:12px;padding:10px 14px;background:var(--bg);border:1px solid var(--line)}
-.fb{border-radius:12px;padding:10px 14px;margin:0}
-.fb.ok{background:var(--ok-soft)}.fb.bad{background:var(--red-soft)}
-.sci{background:var(--blue-soft);border-radius:12px;padding:12px 14px}
-.sci h3{color:var(--blue);margin-bottom:4px}
-.prefix{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;font-family:var(--f-num);font-size:.92rem}
-.prefix div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
-@media (max-width:560px){.prefix{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.chip{font:700 1.05rem var(--f-body);border-radius:12px;padding:10px 14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:50px;min-width:64px}
+.chip[aria-pressed="true"]{border-color:var(--navy);background:var(--navy-soft)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.chip.bad{border-color:var(--red);background:var(--red-soft)}
+.chip:disabled{cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.fb{border-radius:12px;padding:10px 14px;margin:0;font-weight:700}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}.fb.bad{background:var(--red-soft)}
+.fb.bad span{font-weight:400}
+.model{display:flex;justify-content:center}.model svg{width:min(100%,340px);height:auto}
+.note{font-size:.85rem;color:var(--muted);text-align:center;margin:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.pick{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px;background:var(--bg)}
+.pick h3{font-size:1rem}
+.preview{border:2px dashed var(--line);border-radius:14px;padding:12px;text-align:center;font:700 1.4rem var(--f-head);min-height:58px;overflow-wrap:anywhere}
+.done-box{display:grid;gap:12px;justify-items:center;text-align:center;padding:10px}
+.done-box .stars{font-size:2.2rem;color:var(--gold);letter-spacing:4px}
+.stars i{color:var(--line);font-style:normal}
+.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .3s}@keyframes pop{50%{transform:scale(1.06)}}
 .rcard{border:2px solid var(--navy);border-radius:16px;padding:18px;display:grid;gap:12px;background:#FFFFFF;color:#1A2433;max-width:560px;width:100%;margin:0 auto}
 .rcard table{width:100%;border-collapse:collapse}.rcard td,.rcard th{padding:7px 6px;border-top:1px solid #D9E0EA;text-align:left}.rcard th{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:#5A6678;border-top:0}
-.rcard .st{color:#A97F0F;font-size:1.2rem;white-space:nowrap}
-@media (max-width:480px){.rcard{padding:12px}.rcard table{font-size:.85rem}.rcard td,.rcard th{padding:6px 3px}.rcard .st{font-size:1rem}}.rcard .st i{color:#D9E0EA;font-style:normal}
+.rcard .st{color:#A97F0F;font-size:1.2rem;white-space:nowrap}.rcard .st i{color:#D9E0EA;font-style:normal}
+@media (max-width:480px){.rcard{padding:12px}.rcard table{font-size:.85rem}.rcard td,.rcard th{padding:6px 3px}.rcard .st{font-size:1rem}}
 .who{display:flex;flex-wrap:wrap;gap:12px}.who label{display:grid;gap:4px;font-weight:700}
 .who input{font:500 1rem var(--f-body);border:2px solid var(--line);border-radius:10px;padding:10px;min-height:48px;background:var(--surface);color:var(--ink)}
 footer{color:var(--muted);font-size:.85rem}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.slot{border:2px dashed var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:8px;min-height:84px;display:grid;gap:2px;justify-items:center;align-content:center;cursor:pointer;font:400 1rem var(--f-body)}
+.slot b{font:700 1.4rem var(--f-num)}.slot .dots{font-size:.6rem;letter-spacing:1px;color:var(--muted);overflow-wrap:anywhere;text-align:center}
+.slot em{font-style:normal;font-weight:700;color:var(--ok);min-height:1.2em}
+.slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:460px;margin:0 auto;width:100%}
+.ctr{display:flex;align-items:center;gap:10px}
+.ctr .pm{width:52px;height:52px;border-radius:12px;border:2px solid var(--navy);background:var(--surface);color:var(--navy);font:700 1.6rem var(--f-num);cursor:pointer}
+.ctr output{font:700 1.6rem var(--f-num);min-width:2ch;text-align:center}.ctr span{color:var(--muted)}
 </style>
 <div class="wrap">
- <header class="top">
-  <div><h1>Molecule Namer Lab</h1><p>Build covalent molecules and discover the rules for naming them. Predict first, then test it in the lab.</p></div>
-  <div class="dots" id="dots" aria-label="Missions"></div>
- </header>
-
- <section class="card" id="mCard">
-  <div><span class="pill" style="cursor:default" id="mTag">Mission 1</span></div>
-  <h2 id="mTitle"></h2>
-  <p class="intro" id="mIntro"></p>
- </section>
-
- <section class="card" id="s1">
-  <div class="step-h"><span class="step-n">1</span><h2>Predict</h2></div>
-  <p id="pQ" style="margin:0;font-weight:700"></p>
-  <div class="opts" id="pOpts"></div>
-  <button class="btn" id="lockBtn" disabled>Lock in my prediction</button>
-  <p class="fb ok" id="pLocked" hidden></p>
- </section>
-
- <section class="card" id="s2">
-  <div class="step-h"><span class="step-n">2</span><h2>Test it in the lab</h2></div>
-  <div class="locked" id="labLock"><b>🔒 The lab is locked</b><span>Lock in your prediction first.</span></div>
-  <div id="labBody" hidden style="display:grid;gap:14px">
-   <ol class="instr" id="instr"></ol>
-   <div class="banner" id="banner"></div>
-   <div class="lab" id="lab">
-    <div class="target" id="target" hidden><div><span style="color:var(--muted)">Build this:</span><br><b id="tName"></b></div><span class="match" id="tMatch">Not yet</span></div>
-    <div class="pickers">
-     <div class="pick"><label for="selA">First element</label><select id="selA"></select>
-      <div class="count"><button type="button" id="aMinus" aria-label="Fewer atoms of the first element">−</button><output id="aN">1</output><button type="button" id="aPlus" aria-label="More atoms of the first element">+</button><span>atoms</span></div></div>
-     <div class="pick"><label for="selB">Second element</label><select id="selB"></select>
-      <div class="count"><button type="button" id="bMinus" aria-label="Fewer atoms of the second element">−</button><output id="bN">1</output><button type="button" id="bPlus" aria-label="More atoms of the second element">+</button><span>atoms</span></div></div>
-    </div>
-    <canvas id="cv" width="900" height="380" style="aspect-ratio:auto" aria-label="Model of the compound"></canvas>
-    <div class="read">
-     <div class="rc"><span>Formula</span><b id="rF">–</b></div>
-     <div class="rc" id="rTypeC"><span>Type</span><b id="rT" style="font-size:1.05rem">–</b></div>
-     <div class="rc" style="grid-column:1/-1"><span>Name</span><b class="nm" id="rN">Choose two elements</b></div>
-    </div>
-    <div class="notes" id="notes"></div>
-    <div><span style="color:var(--muted);font-size:.9rem">Names you built:</span><div class="hist" id="hist"></div></div>
-    <details><summary style="cursor:pointer;font-weight:700">Prefix table</summary><div class="prefix" id="ptab" style="margin-top:8px"></div></details>
-    <p class="model">Model: atoms are drawn as balls in model-kit colours; lines are bonds. The shapes are simplified, not real 3D shapes.</p>
-   </div>
-  </div>
- </section>
-
- <section class="card" id="s3">
-  <div class="step-h"><span class="step-n">3</span><h2>What did you find?</h2></div>
-  <div class="locked" id="fLock"><b>🔒 Finish the lab steps first</b><span>Each step ticks when you do it.</span></div>
-  <div id="fBody" hidden style="display:grid;gap:14px">
-   <div class="cmp"><div><span style="color:var(--muted)">You predicted</span><br><b id="cP"></b></div><div><span style="color:var(--muted)">The lab showed</span><br><b id="cL"></b></div></div>
-   <p class="fb" id="cMsg"></p>
-   <div id="fq" style="display:grid;gap:10px"></div>
-   <div class="sci" id="sci" hidden><h3>The science</h3><div id="sciT"></div></div>
-   <button class="btn" id="nextBtn" hidden>Next mission →</button>
-  </div>
- </section>
-
- <section class="card" id="sumCard" hidden>
-  <h2>What you found out</h2>
-  <ul id="sumList" style="margin:0;padding-left:1.2em;display:grid;gap:6px"></ul>
-  <p class="intro" style="background:var(--navy-soft)">Now copy the prefix table and the naming rules into your Lesson 1 notes (Naming covalent compounds).</p>
-  <p style="margin:0">The lab is now open for free exploration. Try your own compounds!</p>
- </section>
-
- <section class="card" id="resCard">
+ <header class="top"><h1>Molecule Namer Lab</h1><p>About 6 minutes · 3 tasks: spot covalent compounds, learn the prefixes, name molecules.</p></header>
+ <nav class="tabs" id="tabs" aria-label="Tasks"></nav>
+ <main id="stage" class="card" aria-live="polite"></main>
+ <section class="card" id="resCard" hidden>
   <h2>★ My results card</h2>
-  <p style="margin:0;color:var(--muted)">Type your name and class, then take a screenshot of the card and post it on Toddle.</p>
+  <p style="margin:0;color:var(--muted)">Type your name and class. Take a screenshot of the card and post it on Toddle.</p>
   <div class="who"><label for="rName">Name<input id="rName" maxlength="40" autocomplete="name"></label><label for="rClass">Class<input id="rClass" maxlength="12" placeholder="e.g. 9A"></label></div>
   <div class="rcard" id="rcard"></div>
+  <button class="btn ghost" id="again" type="button" style="justify-self:start">Start again</button>
  </section>
  <footer>Grade 9 Chemistry · Madar International School</footer>
 </div>
 <script>
-const MODE="name";
-const is=(a,b,na,nb)=>s=>s.a===a&&s.b===b&&(na==null||s.na===na)&&(nb==null||s.nb===nb);
-const MISSIONS=[
-{title:"One oxygen or two?",
- intro:"Car engines and generators make <b>CO</b>, a deadly gas. We breathe out <b>CO₂</b>, the gas in fizzy drinks. Same two elements, very different gases. Can their names be the same?",
- predict:{q:"CO and CO₂ are made of the same two elements. Will they have the same name?",opts:["Yes. Same elements, same name.","No. The name changes when the number of atoms changes.","Only the formula changes, not the name."],ans:1},
- steps:[
-  {text:"First element: choose <b>C · carbon</b>.",short:"First element: choose C · carbon.",check:s=>s.a==='C'},
-  {text:"Second element: choose <b>O · oxygen</b>. Read the name.",short:"Second element: choose O · oxygen. Read the name.",check:is('C','O',1,1)},
-  {text:"Press <b>+</b> once for oxygen (2 oxygen atoms). Compare the two names in “Names you built”.",short:"Press + once for oxygen. Compare the two names.",check:is('C','O',1,2)}],
- follow:[
-  {q:"What does the prefix <b>di-</b> mean?",opts:["one","two","three","four"],ans:1,hints:["Mono- means one. Look at CO₂: how many oxygen atoms?",,"Tri- means three. Count the oxygen atoms in CO₂.","Tetra- means four. Count the oxygen atoms in CO₂."]},
-  {q:"CO is called <b>carbon</b> monoxide, not “monocarbon monoxide”. Which rule does this show?",opts:["Never put mono- on the first element","Never put mono- on the second element","Never use prefixes"],ans:0,hints:[,"Look again: carbon MONoxide. The second element has mono-.","Monoxide and dioxide are prefixes, so we do use them."]}],
- explain:"CO and CO₂ are <b>covalent compounds</b>: two non-metals that share electrons. A <b>prefix</b> counts the atoms: carbon <b>mon</b>oxide (1 oxygen), carbon <b>di</b>oxide (2 oxygen). If there is only one atom of the <b>first</b> element, we leave out mono-."},
-{title:"Counting with prefixes",
- intro:"Every covalent name counts its atoms with a prefix: mono 1, di 2, tri 3, tetra 4, penta 5, hexa 6, hepta 7, octa 8, nona 9, deca 10. Open the <b>Prefix table</b> in the lab if you need it.",
- predict:{q:"A molecule has <b>4</b> oxygen atoms. Which prefix will the name use for oxygen?",opts:["di-","tri-","tetra-","penta-"],ans:2},
- steps:[
-  {text:"First element <b>N · nitrogen</b>, second element <b>O · oxygen</b>.",short:"First element N, second element O.",check:is('N','O')},
-  {text:"Make <b>2</b> nitrogen atoms.",short:"Make 2 nitrogen atoms.",check:is('N','O',2)},
-  {text:"Make <b>4</b> oxygen atoms. Read the name and the yellow notes.",short:"Make 4 oxygen atoms. Read the name and notes.",check:is('N','O',2,4)}],
- follow:[
-  {q:"PCl₅ has 1 phosphorus atom and 5 chlorine atoms. Its name is…",opts:["phosphorus pentachloride","monophosphorus pentachloride","phosphorus tetrachloride","pentaphosphorus chloride"],ans:0,hints:[,"Close! But we never put mono- on the first element.","Tetra- means 4. PCl₅ has 5 chlorine atoms.","The 5 belongs to chlorine, not phosphorus."]},
-  {q:"Which name is spelled correctly?",opts:["dinitrogen tetraoxide","dinitrogen tetroxide","dinitrogen tetroxid"],ans:1,hints:["Before “oxide”, the a of tetra is dropped.",,"The ending is -ide: oxide."]}],
- explain:"N₂O₄ is <b>di</b>nitrogen <b>tetr</b>oxide. The second element ends in <b>-ide</b> (oxygen → oxide, chlorine → chloride). Before “oxide”, drop the <b>a</b> or <b>o</b> of the prefix: monoxide, tetroxide, pentoxide. Di- and tri- keep their i: dioxide."},
-{title:"Ionic or covalent?",
- intro:"Not every compound uses prefixes. Table salt from the Gulf is <b>sodium chloride</b>, not “monosodium monochloride”. Why?",
- predict:{q:"Sodium chloride (NaCl) is a metal + a non-metal. Will its name use prefixes?",opts:["Yes: monosodium monochloride","No: ionic names never use prefixes","Only on chlorine: sodium monochloride"],ans:1},
- steps:[
-  {text:"First element: choose <b>Na · sodium</b> (a metal).",short:"First element: choose Na · sodium.",check:s=>s.a==='Na'},
-  {text:"Second element: choose <b>Cl · chlorine</b>. Read the Type card.",short:"Second element: choose Cl. Read the Type card.",check:is('Na','Cl',1,1)},
-  {text:"Change the first element to <b>N · nitrogen</b> and make <b>3</b> chlorine atoms.",short:"Change to N · nitrogen, then make 3 chlorine atoms.",check:is('N','Cl',1,3)}],
- follow:[
-  {q:"Which compound needs prefixes in its name?",opts:["MgO","SCl₂","KBr","CaCl₂"],ans:1,hints:["Mg is a metal, so MgO is ionic: magnesium oxide.",,"K is a metal, so KBr is ionic: potassium bromide.","Ca is a metal, so CaCl₂ is ionic: calcium chloride."]}],
- explain:"<b>Metal + non-metal = ionic.</b> The charges decide the formula, so the name needs no prefixes: sodium chloride. <b>Non-metal + non-metal = covalent.</b> Atoms can join in different numbers, so prefixes show which one: NCl₃ is nitrogen <b>tri</b>chloride."}
-];
-const SUMMARY=["A covalent compound is made of <b>two non-metals</b> that share electrons.","Prefixes count the atoms: mono 1, di 2, tri 3, tetra 4, penta 5, hexa 6, hepta 7, octa 8, nona 9, deca 10.","Never put mono- on the first element. The second element ends in <b>-ide</b>; drop a/o before oxide.","Ionic compounds (metal + non-metal) <b>never</b> use prefixes. Water (H₂O) and ammonia (NH₃) keep their common names."];
-
-// ---------- chemistry ----------
-const EL={H:{n:'hydrogen',ide:'hydride',c:'#FFFFFF',m:0,q:-1},C:{n:'carbon',ide:'carbide',c:'#3B3F45',m:0,q:-4},N:{n:'nitrogen',ide:'nitride',c:'#2F62C8',m:0,q:-3},O:{n:'oxygen',ide:'oxide',c:'#D8392B',m:0,q:-2},
- F:{n:'fluorine',ide:'fluoride',c:'#8FD16A',m:0,q:-1},Si:{n:'silicon',ide:'silicide',c:'#C9A46A',m:0,q:-4},P:{n:'phosphorus',ide:'phosphide',c:'#F08A24',m:0,q:-3},S:{n:'sulfur',ide:'sulfide',c:'#F2CF2C',m:0,q:-2},
- Cl:{n:'chlorine',ide:'chloride',c:'#2EA84A',m:0,q:-1},Br:{n:'bromine',ide:'bromide',c:'#8E2A1E',m:0,q:-1},I:{n:'iodine',ide:'iodide',c:'#6B2E91',m:0,q:-1},
- Na:{n:'sodium',c:'#8E7CC3',m:1,q:1},K:{n:'potassium',c:'#7B5EA7',m:1,q:1},Mg:{n:'magnesium',c:'#2C8C6E',m:1,q:2},Ca:{n:'calcium',c:'#4F7F4F',m:1,q:2},Al:{n:'aluminium',c:'#A7B0BA',m:1,q:3}};
-const ORDER=['Si','C','P','N','H','S','I','Br','Cl','O','F'];
-const PRE=['','mono','di','tri','tetra','penta','hexa','hepta','octa','nona','deca'];
-const SUB='₀₁₂₃₄₅₆₇₈₉';const sub=n=>n>1?String(n).split('').map(d=>SUB[d]).join(''):'';
-const COMMON={H2O:'water',NH3:'ammonia',CH4:'methane'};
-const gcd=(a,b)=>b?gcd(b,a%b):a;
-function analyse(s){const r={formula:'–',name:'',type:'',notes:[],valid:false};if(!s.a||!s.b){r.name='Choose two elements';return r;}
- if(s.a===s.b){r.name='Choose two different elements';r.notes.push(['warn','Choose two different elements.']);return r;}
- const A=EL[s.a],B=EL[s.b];r.formula=s.a+sub(s.na)+s.b+sub(s.nb);
- if(B.m&&!A.m){r.name='Put the metal first';r.type='Ionic';r.notes.push(['warn','The metal is always written first. Swap the two elements.']);return r;}
- if(A.m&&B.m){r.name='Two metals do not make an ionic or covalent compound here';r.notes.push(['warn','Choose a non-metal as the second element.']);return r;}
- if(A.m){r.type='Ionic';r.name=A.n+' '+B.ide;const ok=s.na*A.q===s.nb*(-B.q)&&gcd(s.na,s.nb)===1;r.valid=ok;
-  r.notes.push(['','Metal + non-metal = IONIC. Ionic names never use prefixes.']);
-  if(!ok){const g=gcd(A.q,-B.q);r.notes.push(['warn',`The charges don't balance, so this ionic compound does not exist. ${s.a}${A.q>1?A.q:''}+ and ${s.b}${-B.q>1?-B.q:''}− balance as ${s.a}${sub((-B.q)/g)}${s.b}${sub(A.q/g)}.`]);}
-  return r;}
- r.type='Covalent';r.valid=true;
- if(ORDER.indexOf(s.a)>ORDER.indexOf(s.b)){r.valid=false;r.name='Swap the elements';r.notes.push(['warn',`Usually written the other way round: ${B.n} is written first.`]);return r;}
- let p2=PRE[s.nb],root=B.ide;let drop=false;if(root==='oxide'&&/[ao]$/.test(p2)){p2=p2.slice(0,-1);drop=true;}
- r.name=(s.na>1?PRE[s.na]:'')+A.n+' '+p2+root;
- r.notes.push(['','Non-metal + non-metal = COVALENT. Prefixes count the atoms.']);
- if(s.na===1)r.notes.push(['','No “mono-” on the first element: just “'+A.n+'”.']);
- if(drop)r.notes.push(['',`${PRE[s.nb]} + oxide → ${p2}oxide (the last vowel of the prefix is dropped).`]);
- const cm=COMMON[s.a+(s.na>1?s.na:'')+s.b+(s.nb>1?s.nb:'')];if(cm){r.common=cm;r.notes.push(['','Common name: '+cm+'. Chemists always use this name.']);}
- return r;}
-// ---------- lab state + UI ----------
-const S={a:'',b:'',na:1,nb:1};let seen=new Set(),hist=[];
 const $=id=>document.getElementById(id);
-function fillSel(sel){sel.innerHTML='<option value="">choose…</option>'+Object.keys(EL).map(k=>`<option value="${k}">${k} · ${EL[k].n}${EL[k].m?' (metal)':''}</option>`).join('');}
-fillSel($('selA'));fillSel($('selB'));
-$('ptab').innerHTML=PRE.slice(1).map((p,i)=>`<div>${i+1} = ${p}-</div>`).join('');
-function setS(k,v){S[k]=v;labChanged();}
-$('selA').onchange=e=>setS('a',e.target.value);$('selB').onchange=e=>setS('b',e.target.value);
-$('aMinus').onclick=()=>setS('na',Math.max(1,S.na-1));$('aPlus').onclick=()=>setS('na',Math.min(10,S.na+1));
-$('bMinus').onclick=()=>setS('nb',Math.max(1,S.nb-1));$('bPlus').onclick=()=>setS('nb',Math.min(10,S.nb+1));
-function renderLab(){$('selA').value=S.a;$('selB').value=S.b;$('aN').value=$('aN').textContent=S.na;$('bN').textContent=S.nb;
- const r=analyse(S);$('rF').innerHTML=r.formula==='–'?'–':r.formula;$('rN').textContent=r.name+(r.common?'  ('+r.common+')':'');$('rT').textContent=r.type||'–';
- $('rTypeC').className='rc'+(r.type==='Ionic'?' type-ionic':r.type==='Covalent'?' type-cov':'');
- $('notes').innerHTML=r.notes.map(([k,t])=>`<div class="note ${k}">${t}</div>`).join('');
- if(r.valid&&r.name){const key=r.formula+' = '+r.name;if(!hist.includes(key)){hist.unshift(key);hist=hist.slice(0,6);}}
- $('hist').innerHTML=hist.map(h=>`<span>${h}</span>`).join('')||'<span>none yet</span>';
- const M=MISSIONS[cur];const T=M&&((M.steps[Math.min(stepI,M.steps.length-1)]||{}).target||M.target);if(MODE==='formula'&&T&&!freeMode&&locked){$('target').hidden=false;$('tName').textContent=T.name;const ok=matches(T);$('tMatch').textContent=ok?'✓ Matches!':'Not yet';$('tMatch').className='match'+(ok?' yes':'');}else $('target').hidden=true;
- draw();}
-const matches=T=>S.a===T.a&&S.b===T.b&&S.na===T.na&&S.nb===T.nb;
-// ---------- canvas model ----------
-const cv=$('cv'),cx=cv.getContext('2d');let anim=0;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function ball(x,y,r,col,label){const g=cx.createRadialGradient(x-r*.35,y-r*.35,r*.15,x,y,r);g.addColorStop(0,'#ffffff');g.addColorStop(.25,col);g.addColorStop(1,shade(col));cx.fillStyle=g;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();cx.lineWidth=2;cx.strokeStyle='rgba(0,0,0,.35)';cx.stroke();
- cx.fillStyle=lum(col)>.6?'#1A2433':'#FFFFFF';cx.font=`700 ${Math.max(12,Math.round(r*.7))}px "IBM Plex Mono",monospace`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(label,x,y+1);}
-function shade(h){const n=parseInt(h.slice(1),16);const r=(n>>16)*.6,g=(n>>8&255)*.6,b=(n&255)*.6;return `rgb(${r|0},${g|0},${b|0})`;}
-function lum(h){const n=parseInt(h.slice(1),16);return (.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255;}
-let DPR=1,K=1;function fit(){DPR=Math.min(2,window.devicePixelRatio||1);const w=Math.max(280,cv.clientWidth||900);const h=Math.round(Math.max(270,Math.min(380,w*0.5)));if(cv.width!==Math.round(w*DPR)||cv.height!==Math.round(h*DPR)){cv.width=Math.round(w*DPR);cv.height=Math.round(h*DPR);}K=Math.min(1,w/560);}
-addEventListener('resize',()=>{fit();draw();});
-function draw(){fit();const W=cv.width/DPR,H=cv.height/DPR,t=reduce?0:performance.now()/1000;cx.setTransform(DPR,0,0,DPR,0,0);cx.clearRect(0,0,W,H);
- const css=getComputedStyle(document.documentElement);const ink=css.getPropertyValue('--muted').trim()||'#5A6678';
- if(!S.a||!S.b||S.a===S.b){cx.fillStyle=ink;cx.font='600 17px "Atkinson Hyperlegible",sans-serif';cx.textAlign='center';cx.fillText('Choose two elements to build a compound',W/2,H/2);return;}
- const A=EL[S.a],B=EL[S.b];const ionic=A.m||B.m;
- if(ionic){const n=S.na+S.nb;const cols=Math.min(n,8),rows=Math.ceil(n/cols);const sz=Math.min(70,(W-40)/cols/1.25);const list=[];let ia=0,ib=0;for(let i=0;i<n;i++){if((i%2===0&&ia<S.na)||ib>=S.nb){list.push(['a',S.a,A]);ia++;}else{list.push(['b',S.b,B]);ib++;}}
-  list.forEach(([k,sym,E],i)=>{const c=i%cols,r=Math.floor(i/cols);const x=W/2+(c-(cols-1)/2)*sz*1.25,y=H/2+(r-(rows-1)/2)*sz*1.25+Math.sin(t*2+i)*2;ball(x,y,sz*.42,E.c,sym);
-   cx.fillStyle=ink;cx.font='700 18px "IBM Plex Mono",monospace';cx.fillText(E.m?`${E.q>1?E.q:''}+`:`${-E.q>1?-E.q:''}−`,x+sz*.42,y-sz*.42);});
-  cx.fillStyle=ink;cx.font='600 15px "Atkinson Hyperlegible",sans-serif';cx.fillText('Ions (charged particles), not a molecule',W/2,H-18);return;}
- // molecule: central atoms in a row, outer atoms around
- const ra=Math.max(22,40-S.na*2)*K,rb=Math.max(18,32-S.nb)*K;const cxs=[];for(let i=0;i<S.na;i++)cxs.push([W/2+(i-(S.na-1)/2)*ra*2.1,H/2]);
- const outer=[];for(let j=0;j<S.nb;j++){const st=S.nb<=2?0:-Math.PI/2+(S.nb%2?0:Math.PI/S.nb);const a=st+j/S.nb*Math.PI*2;const R=ra*1.2+rb*1.4+S.na*ra*.55;outer.push([W/2+Math.cos(a)*R*1.25,H/2+Math.sin(a)*R*.8]);}
- cx.strokeStyle=ink;cx.lineWidth=6;outer.forEach(([x,y])=>{let best=cxs[0],bd=1e9;cxs.forEach(c=>{const d=Math.hypot(c[0]-x,c[1]-y);if(d<bd){bd=d;best=c;}});cx.beginPath();cx.moveTo(best[0],best[1]);cx.lineTo(x,y);cx.stroke();});
- for(let i=1;i<cxs.length;i++){cx.beginPath();cx.moveTo(cxs[i-1][0],cxs[i-1][1]);cx.lineTo(cxs[i][0],cxs[i][1]);cx.stroke();}
- outer.forEach(([x,y],j)=>ball(x,y+Math.sin(t*2+j)*2,rb,B.c,S.b));cxs.forEach(([x,y],i)=>ball(x,y+Math.sin(t*2+i+3)*2,ra,A.c,S.a));
- cx.fillStyle=ink;cx.font='600 15px "Atkinson Hyperlegible",sans-serif';cx.textAlign='center';cx.fillText('One molecule (atoms share electrons)',W/2,H-18);}
-function loop(){draw();if(!reduce)requestAnimationFrame(loop);}
-// ---------- mission engine ----------
-let cur=0,freeMode=false,state=load()||{done:[],pred:{},stat:{}};
-function save(){try{localStorage.setItem('sim3-'+document.title,JSON.stringify({...state,cur}));}catch(e){}}
-function load(){try{const v=JSON.parse(localStorage.getItem('sim3-'+document.title)||'null');if(v){cur=Math.min(v.cur||0,MISSIONS.length-1);}return v;}catch(e){return null;}}
-let pred=null,locked=false,stepI=0,ticked=[],fqI=0;
-function dots(){$('dots').innerHTML=MISSIONS.map((m,i)=>`<button class="dot ${i===cur&&!freeMode?'cur':''} ${state.done.includes(i)?'done':''}" ${i<=Math.max(cur,...state.done.map(x=>x+1),0)?'':'disabled'} data-i="${i}" aria-label="Mission ${i+1}">${i+1}</button>`).join('')+`<button class="pill" id="goRes">★ Results</button>`;
- [...$('dots').querySelectorAll('.dot')].forEach(b=>b.onclick=()=>openMission(+b.dataset.i));$('goRes').onclick=()=>$('resCard').scrollIntoView({behavior:reduce?'auto':'smooth'});}
-function openMission(i){cur=i;freeMode=false;const M=MISSIONS[i];pred=null;locked=false;stepI=0;ticked=M.steps.map(()=>false);fqI=0;
- $('mTag').textContent=`Mission ${i+1} of ${MISSIONS.length}`;$('mTitle').textContent=M.title;$('mIntro').innerHTML=M.intro;
- $('pQ').innerHTML=M.predict.q;$('pOpts').innerHTML='';M.predict.opts.forEach((o,k)=>{const b=document.createElement('button');b.className='opt';b.type='button';b.innerHTML=o;b.setAttribute('aria-pressed','false');
-  b.onclick=()=>{if(locked)return;pred=k;[...$('pOpts').children].forEach(x=>x.setAttribute('aria-pressed',x===b));$('lockBtn').disabled=false;};$('pOpts').appendChild(b);});
- $('lockBtn').disabled=true;$('lockBtn').hidden=false;$('pLocked').hidden=true;$('labLock').hidden=false;$('labBody').hidden=true;$('fLock').hidden=false;$('fBody').hidden=true;
- S.a='';S.b='';S.na=1;S.nb=1;hist=[];if(M.setup)M.setup(S);
- $('instr').innerHTML=M.steps.map((s,k)=>`<li id="st${k}"><span class="tk">${k+1}</span><div><div>${s.text}</div>${s.manual?`<button class="btn ghost man" type="button" data-k="${k}" hidden>I have done this ✓</button>`:''}</div></li>`).join('');
- [...$('instr').querySelectorAll('.man')].forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(k===stepI)tick(k);});
- renderLab();refreshSteps();dots();save();$('mCard').scrollIntoView({behavior:reduce?'auto':'smooth'});}
-$('lockBtn').onclick=()=>{if(pred===null)return;locked=true;state.pred[cur]=pred;[...$('pOpts').children].forEach(b=>b.disabled=true);$('lockBtn').hidden=true;
- $('pLocked').hidden=false;$('pLocked').innerHTML='Prediction locked: <b>'+MISSIONS[cur].predict.opts[pred]+'</b>';$('labLock').hidden=true;$('labBody').hidden=false;refreshSteps();save();const s0=MISSIONS[cur].steps[0];if(s0&&!s0.manual&&s0.check(S))tick(0);renderLab();};
-function labChanged(){renderLab();if(!freeMode&&locked){const M=MISSIONS[cur];const s=M.steps[stepI];if(s&&!s.manual&&s.check(S))tick(stepI);}}
-function tick(k){ticked[k]=true;stepI=k+1;while(stepI<ticked.length){const s=MISSIONS[cur].steps[stepI];if(!s.manual&&s.check(S)){ticked[stepI]=true;stepI++;}else break;}refreshSteps();renderLab();if(stepI>=ticked.length)openFollow();}
-function refreshSteps(){const M=MISSIONS[cur];M.steps.forEach((s,k)=>{const li=$('st'+k);if(!li)return;li.className=ticked[k]?'ok':k===stepI?'cur':'';li.querySelector('.tk').textContent=ticked[k]?'✓':k+1;const b=li.querySelector('.man');if(b)b.hidden=!(k===stepI&&locked);});
- const s=M.steps[stepI];$('banner').className='banner'+(s?'':' done');$('banner').textContent=s?`Step ${stepI+1}: ${s.short||s.text.replace(/<[^>]+>/g,'')}`:'All steps done ✓  Go to Step 3 below.';}
-function stat(){return state.stat[cur]||(state.stat[cur]={tries:0,wrong:0});}
-function openFollow(){const M=MISSIONS[cur];$('fLock').hidden=true;$('fBody').hidden=false;const p=state.pred[cur],ok=p===M.predict.ans;
- $('cP').innerHTML=M.predict.opts[p]+(ok?' ✓':' ✗');$('cL').innerHTML=M.predict.opts[M.predict.ans];$('cMsg').className='fb '+(ok?'ok':'bad');
- $('cMsg').textContent=ok?'Your prediction matched the lab. Great thinking!':'Your prediction was different from the lab. That is how scientists learn: the evidence wins.';
- fqI=0;$('sci').hidden=true;$('nextBtn').hidden=true;showQ();if(!reduce)$('s3').scrollIntoView({behavior:'smooth'});}
-function showQ(){const M=MISSIONS[cur],box=$('fq');if(fqI>=M.follow.length){box.innerHTML+='';$('sci').hidden=false;$('sciT').innerHTML=M.explain;if(!state.done.includes(cur))state.done.push(cur);save();dots();renderCard();
-  $('nextBtn').hidden=false;$('nextBtn').textContent=cur<MISSIONS.length-1?'Next mission →':'See what you found out →';return;}
- const Q=M.follow[fqI];const d=document.createElement('div');d.className='card';d.style.padding='14px';d.innerHTML=`<b>Question ${fqI+1} of ${M.follow.length}</b><p style="margin:0">${Q.q}</p><div class="opts"></div><p class="fb" hidden></p>`;
- const o=d.querySelector('.opts'),fb=d.querySelector('.fb');let done=false;
- Q.opts.forEach((t,k)=>{const b=document.createElement('button');b.className='opt';b.type='button';b.innerHTML=t;b.onclick=()=>{if(done)return;const st=stat();st.tries++;
-   if(k===Q.ans){done=true;b.classList.add('right');[...o.children].forEach(x=>x.disabled=true);fb.hidden=false;fb.className='fb ok';fb.innerHTML='Correct! '+(Q.why||'');fqI++;save();renderCard();setTimeout(showQ,reduce?0:500);}
-   else{st.wrong++;b.classList.add('wrong');b.disabled=true;fb.hidden=false;fb.className='fb bad';fb.innerHTML='Not quite. '+((Q.hints&&Q.hints[k])||'Look at the lab again and try another answer.');save();renderCard();}};o.appendChild(b);});
- box.appendChild(d);}
-$('nextBtn').onclick=()=>{if(cur<MISSIONS.length-1){$('fq').innerHTML='';openMission(cur+1);}else finish();};
-function finish(){freeMode=true;$('sumCard').hidden=false;$('sumList').innerHTML=SUMMARY.map(s=>`<li>${s}</li>`).join('');
- $('labLock').hidden=true;$('labBody').hidden=false;$('instr').innerHTML='';$('banner').className='banner done';$('banner').textContent='Free exploration: build any compound you like.';renderLab();dots();$('sumCard').scrollIntoView({behavior:reduce?'auto':'smooth'});}
-// ---------- results card ----------
-function stars(i){if(!state.done.includes(i))return 0;const s=state.stat[i]||{wrong:0};return s.wrong===0?3:s.wrong<=2?2:1;}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function renderCard(){const nm=$('rName').value.trim(),cl=$('rClass').value.trim();const d=new Date();let tot=0,tries=0;
- const rows=MISSIONS.map((m,i)=>{const s=stars(i);tot+=s;const st=state.stat[i]||{tries:0};tries+=st.tries;const p=state.pred[i];
-  return `<tr><td>${i+1}. ${esc(m.title)}</td><td class="st">${'★'.repeat(s)}<i>${'★'.repeat(3-s)}</i></td><td>${state.done.includes(i)?st.tries:'–'}</td><td>${p===undefined?'–':p===m.predict.ans?'✓':'✗'}</td></tr>`;}).join('');
- $('rcard').innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="font-family:var(--f-head);font-size:1.2rem">${esc(document.title)}</b><div style="color:#5A6678;font-size:.85rem">Results card</div></div><b style="font:700 1.5rem var(--f-num);color:#A97F0F">★ ${tot} / ${MISSIONS.length*3}</b></div>
- <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;background:#F6F8FB;border-radius:10px;padding:10px"><div><small style="color:#5A6678">NAME</small><br><b style="color:${nm?'#1A2433':'#CC4B31'}">${nm?esc(nm):'type your name'}</b></div><div><small style="color:#5A6678">CLASS</small><br><b style="color:${cl?'#1A2433':'#CC4B31'}">${cl?esc(cl):'type your class'}</b></div><div><small style="color:#5A6678">DATE</small><br><b>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</b></div></div>
- <div style="overflow-x:auto"><table><tr><th>Mission</th><th>Stars</th><th>Tries</th><th>Guess</th></tr>${rows}</table></div>
- <small style="color:#5A6678">★★★ = all follow-up answers right first time · ${tries} answer tries in total</small>`;}
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EL={H:{n:'hydrogen',ide:'hydride',c:'#FFFFFF'},C:{n:'carbon',ide:'carbide',c:'#3B3F45'},N:{n:'nitrogen',ide:'nitride',c:'#2F62C8'},O:{n:'oxygen',ide:'oxide',c:'#D8392B'},
+ F:{n:'fluorine',ide:'fluoride',c:'#8FD16A'},Si:{n:'silicon',ide:'silicide',c:'#C9A46A'},P:{n:'phosphorus',ide:'phosphide',c:'#F08A24'},S:{n:'sulfur',ide:'sulfide',c:'#F2CF2C'},
+ Cl:{n:'chlorine',ide:'chloride',c:'#2EA84A'},Br:{n:'bromine',ide:'bromide',c:'#8E2A1E'},I:{n:'iodine',ide:'iodide',c:'#6B2E91'},
+ Na:{n:'sodium',c:'#8E7CC3',m:1},K:{n:'potassium',c:'#7B5EA7',m:1},Mg:{n:'magnesium',c:'#2C8C6E',m:1},Ca:{n:'calcium',c:'#4F7F4F',m:1},Al:{n:'aluminium',c:'#A7B0BA',m:1}};
+const PRE=['','mono','di','tri','tetra','penta','hexa','hepta','octa','nona','deca'];
+const SUBS='₀₁₂₃₄₅₆₇₈₉';const sub=n=>n>1?String(n).split('').map(d=>SUBS[d]).join(''):'';
+const fml=(a,na,b,nb)=>a+sub(na)+b+sub(nb);
+function joinPre(p,root){return (root[0]==='o'&&/[ao]$/.test(p))?p.slice(0,-1)+root:p+root;}
+function covName(a,na,b,nb){return (na>1?PRE[na]:'')+EL[a].n+' '+joinPre(PRE[nb],EL[b].ide);}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// ball-and-stick model (simplified)
+let gid=0;
+function molSVG(a,na,b,nb){const W=340,H=240,cx=W/2,cy=H/2;const A=EL[a],B=EL[b];const ra=Math.max(20,30-na*2),rb=Math.max(15,24-nb);
+ const cen=[];for(let i=0;i<na;i++)cen.push([cx+(i-(na-1)/2)*ra*2.2,cy]);
+ const st=nb<=2?0:-Math.PI/2+(nb%2?0:Math.PI/nb);const R=ra+rb+22+(na-1)*ra*.9;
+ const out=[];for(let j=0;j<nb;j++){const t=st+j/nb*Math.PI*2;out.push([cx+Math.cos(t)*R*1.15,cy+Math.sin(t)*R*.78]);}
+ const id='g'+(gid++);const grad=(k,col)=>`<radialGradient id="${id}${k}" cx="35%" cy="32%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity="1"/></radialGradient>`;
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Model: ${na} ${A.n} and ${nb} ${B.n} atoms"><defs>${grad('a',A.c)}${grad('b',B.c)}</defs>`;
+ out.forEach(([x,y])=>{let best=cen[0],bd=1e9;cen.forEach(c=>{const d=Math.hypot(c[0]-x,c[1]-y);if(d<bd){bd=d;best=c;}});s+=`<line x1="${best[0]}" y1="${best[1]}" x2="${x}" y2="${y}" stroke="#8A96A6" stroke-width="7" stroke-linecap="round"/>`;});
+ for(let i=1;i<cen.length;i++)s+=`<line x1="${cen[i-1][0]}" y1="${cy}" x2="${cen[i][0]}" y2="${cy}" stroke="#8A96A6" stroke-width="7"/>`;
+ const lum=h=>{const n=parseInt(h.slice(1),16);return (.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255;};
+ const ball=(x,y,r,k,E,sym)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="url(#${id}${k})" stroke="rgba(20,34,53,.5)" stroke-width="1.5"/><text x="${x}" y="${y+r*.28}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="700" font-size="${Math.round(r*.78)}" fill="${lum(E.c)>.6?'#1A2433':'#fff'}">${sym}</text>`;
+ out.forEach(([x,y])=>s+=ball(x,y,rb,'b',B,b));cen.forEach(([x,y])=>s+=ball(x,y,ra,'a',A,a));
+ return s+'</svg>';}
+const SIM_ID='namer';
+const TASKS=[
+{short:'Spot it',title:'Covalent or ionic?',
+ do:'Look at the elements. Tap Covalent or Ionic.',
+ tip:'<b>Covalent</b> = two <b>non-metals</b>. <b>Ionic</b> = a <b>metal</b> + a non-metal. Metals in this task: Na, K, Mg, Ca.',
+ learned:'A compound made of <b>two non-metals</b> is covalent. A <b>metal</b> + a non-metal is ionic.',
+ run(area,api){const items=[['CO₂','C','O',0],['NaCl','Na','Cl',1],['NCl₃','N','Cl',0],['MgO','Mg','O',1],['SO₂','S','O',0],['KBr','K','Br',1],['PCl₃','P','Cl',0],['CaCl₂','Ca','Cl',1]];
+  let k=0;
+  function show(){progress(k,items.length);if(k>=items.length){api.finish();return;}const [f,a,b,ion]=items[k];
+   area.innerHTML=`<div class="big pop">${f}</div><p class="sub2">${EL[a].n} + ${EL[b].n}</p><div class="row"><button class="btn wide" type="button" data-v="0">Covalent</button><button class="btn wide ghost" type="button" data-v="1">Ionic</button></div><p class="fb" hidden></p>`;
+   const fbE=area.querySelector('.fb');
+   area.querySelectorAll('[data-v]').forEach(btn=>btn.onclick=()=>{const v=+btn.dataset.v;
+    if(v===ion){api.tryRight();area.querySelectorAll('[data-v]').forEach(x=>x.disabled=true);fb(fbE,true,ion?`✓ Ionic: ${EL[a].n} is a metal.`:`✓ Covalent: ${EL[a].n} and ${EL[b].n} are both non-metals.`);k++;setTimeout(show,reduce?600:1100);}
+    else{api.tryWrong();btn.disabled=true;btn.classList.add('shake');fb(fbE,false,ion?`Not quite. <span>Is ${EL[a].n} (${a}) a metal? Look at the list of metals.</span>`:`Not quite. <span>Are ${EL[a].n} and ${EL[b].n} metals? Both are non-metals.</span>`);}});}
+  show();}},
+{short:'Prefixes',title:'Match the prefixes',
+ do:'Tap a prefix. Then tap the number it means.',
+ tip:'Count the dots to help you. Covalent names use these prefixes to count atoms.',
+ learned:'mono 1 · di 2 · tri 3 · tetra 4 · penta 5 · hexa 6 · hepta 7 · octa 8 · nona 9 · deca 10.',
+ css:true,
+ run(area,api){const order=shuffle([1,2,3,4,5,6,7,8,9,10]);let sel=null,done=0;
+  area.innerHTML=`<div class="slots" id="slots">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="slot" type="button" data-n="${n}"><b>${n}</b><span class="dots">${'●'.repeat(n)}</span><em></em></button>`).join('')}</div>
+   <p style="margin:0;font-weight:700">Prefix tiles:</p><div class="row" id="tiles">${order.map(n=>`<button class="chip" type="button" data-p="${n}" aria-pressed="false">${PRE[n]}-</button>`).join('')}</div><p class="fb" hidden></p>`;
+  const fbE=area.querySelector('.fb');progress(0,10);
+  area.querySelectorAll('[data-p]').forEach(t=>t.onclick=()=>{sel=+t.dataset.p;area.querySelectorAll('[data-p]').forEach(x=>x.setAttribute('aria-pressed',x===t));fbE.hidden=true;});
+  area.querySelectorAll('[data-n]').forEach(s=>s.onclick=()=>{const n=+s.dataset.n;if(s.classList.contains('ok'))return;
+   if(sel===null){fb(fbE,false,'First tap a prefix tile. <span>Then tap a number.</span>');return;}
+   if(sel===n){api.tryRight();s.classList.add('ok','pop');s.querySelector('em').textContent=PRE[n]+'-';area.querySelector(`[data-p="${n}"]`).remove();sel=null;done++;progress(done,10);fb(fbE,true,`✓ ${PRE[n]}- = ${n}`);if(done===10)setTimeout(()=>api.finish(),reduce?300:800);}
+   else{api.tryWrong();s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake');fb(fbE,false,`${PRE[sel]}- does not mean ${n}. <span>Try another number.</span>`);}});}},
+{short:'Name it',title:'Name the molecule',
+ do:'Choose the two prefixes and the ending. Then press Check.',
+ tip:'Rules: ① no mono- on the first element ② the second element ends in <b>-ide</b> ③ drop the a or o before “oxide”.',
+ learned:'Covalent name = prefix + first element, then prefix + second element + <b>-ide</b>. CO₂ = carbon dioxide.',
+ run(area,api){const mols=[['C',1,'O',2,'Al Reyadah in Abu Dhabi captures this gas.'],['C',1,'O',1,'A deadly gas from engines and generators.'],['N',1,'Cl',3,''],['S',1,'F',6,'Used inside electrical switches.'],['N',2,'O',4,'Used in rocket engines.']];let k=0;
+  function show(){progress(k,mols.length);if(k>=mols.length){api.finish();return;}const [a,na,b,nb,fact]=mols[k];const p1=[0,1,2,3],p2=[1,2,3,4,5,6];let c1=null,c2=null,c3=null;
+   area.innerHTML=`<div class="big pop">${fml(a,na,b,nb)}</div><div class="model">${molSVG(a,na,b,nb)}</div>${fact?`<p class="note">${fact}</p>`:''}
+    <div class="grid2"><div class="pick"><h3>1 · Prefix for ${EL[a].n}</h3><div class="row" data-g="1">${p1.map(n=>`<button class="chip" type="button" data-v="${n}" aria-pressed="false">${n?PRE[n]+'-':'no prefix'}</button>`).join('')}</div></div>
+    <div class="pick"><h3>2 · Prefix for ${EL[b].n}</h3><div class="row" data-g="2">${p2.map(n=>`<button class="chip" type="button" data-v="${n}" aria-pressed="false">${PRE[n]}-</button>`).join('')}</div></div></div>
+    <div class="pick"><h3>3 · Ending for ${EL[b].n}</h3><div class="row" data-g="3"><button class="chip" type="button" data-v="0" aria-pressed="false">${EL[b].n}</button><button class="chip" type="button" data-v="1" aria-pressed="false">${EL[b].ide}</button></div></div>
+    <div class="preview" id="pv">…</div><p class="note" id="pvn"></p><div class="row"><button class="btn wide" id="chk" type="button" disabled>Check</button></div><p class="fb" hidden></p>`;
+   const fbE=area.querySelector('.fb');
+   function upd(){const first=c1===null?'___':(c1>0?PRE[c1]:'')+EL[a].n;const root=c3===null?'___':(c3?EL[b].ide:EL[b].n);const pre=c2===null?'___':PRE[c2];
+    let second=(c2!==null&&c3!==null)?joinPre(pre,root):pre+root;$('pv').textContent=first+' '+second;
+    $('pvn').textContent=(c2!==null&&c3===1&&root[0]==='o'&&/[ao]$/.test(pre))?`${pre} + ${root} → ${joinPre(pre,root)} (the last a/o of the prefix is dropped)`:'';
+    $('chk').disabled=(c1===null||c2===null||c3===null);}
+   area.querySelectorAll('[data-g]').forEach(g=>g.querySelectorAll('[data-v]').forEach(btn=>btn.onclick=()=>{g.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===btn));const v=+btn.dataset.v;
+    if(g.dataset.g==='1')c1=v;else if(g.dataset.g==='2')c2=v;else c3=v;fbE.hidden=true;upd();}));
+   $('chk').onclick=()=>{const want1=na>1?na:0;
+    if(c1===want1&&c2===nb&&c3===1){api.tryRight();$('chk').disabled=true;area.querySelectorAll('[data-v]').forEach(x=>x.disabled=true);fb(fbE,true,`✓ ${fml(a,na,b,nb)} = ${covName(a,na,b,nb)}`);k++;setTimeout(show,reduce?900:1600);return;}
+    api.tryWrong();let h;
+    if(c1===1)h='Never put mono- on the <b>first</b> element. Choose “no prefix”.';
+    else if(c1!==want1)h=`Count the ${EL[a].n} atoms in the model. One atom = no prefix.`;
+    else if(c2!==nb)h=`Count the ${EL[b].n} atoms in the model. Which prefix means that number?`;
+    else h=`The second element ends in -ide: ${EL[b].n} → ${EL[b].ide}.`;
+    fb(fbE,false,`Not yet. <span>${h}</span>`);};
+   upd();}
+  show();}}
+];
+
+// ---------- state ----------
+const KEY='cov2-'+SIM_ID;
+let ST=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||null;}catch(e){return null;}})()||{done:{},stats:{}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST));}catch(e){}};
+let cur=0;
+function starsOf(t){const s=ST.stats[t];if(!ST.done[t]||!s||!s.items)return 0;const r=s.first/s.items;return r>=.8?3:r>=.5?2:1;}
+const starStr=n=>'★'.repeat(n)+'<i>'+'★'.repeat(3-n)+'</i>';
+function tabs(){$('tabs').innerHTML=TASKS.map((t,i)=>`<button class="tab ${i===cur?'cur':''} ${ST.done[i]?'done':''}" data-i="${i}" type="button"><b>${i+1}</b>${t.short}${ST.done[i]?' ✓':''}</button>`).join('')+`<button class="tab res ${cur==='res'?'cur':''}" id="tRes" type="button">★ Results</button>`;
+ [...$('tabs').querySelectorAll('[data-i]')].forEach(b=>b.onclick=()=>go(+b.dataset.i));$('tRes').onclick=showRes;}
+// API for tasks: one item at a time, first-try scoring
+function makeApi(i){const s=ST.stats[i]={items:0,first:0,tries:0};let wrongThis=false;
+ return {
+  tryWrong(){s.tries++;wrongThis=true;save();},
+  tryRight(){s.tries++;s.items++;if(!wrongThis)s.first++;wrongThis=false;save();},
+  finish(){ST.done[i]=true;save();tabs();const n=starsOf(i);const st=$('stage');
+   const last=i===TASKS.length-1;
+   const box=document.createElement('div');box.className='done-box pop';
+   box.innerHTML=`<div class="stars">${starStr(n)}</div><h2>Task ${i+1} done!</h2><p style="margin:0">${s.first} of ${s.items} right first time.</p><p class="tip" style="text-align:left">${TASKS[i].learned}</p><button class="btn wide" type="button">${last?'See my results card ★':'Next task →'}</button>`;
+   st.innerHTML='';st.appendChild(box);box.querySelector('button').onclick=()=>last?showRes():go(i+1);}
+ };}
+function go(i){cur=i;$('resCard').hidden=true;$('stage').hidden=false;tabs();const T=TASKS[i];const st=$('stage');
+ st.innerHTML=`<div class="thead"><span class="kicker">Task ${i+1} of ${TASKS.length} · ${T.short}</span><span class="count" id="cnt"></span></div><h2>${T.title}</h2><p class="do">${T.do}</p>${T.tip?`<p class="tip">${T.tip}</p>`:''}<div class="bar"><i id="barI"></i></div><div id="area" style="display:grid;gap:14px"></div>`;
+ T.run($('area'),makeApi(i));if(!reduce)st.scrollIntoView({behavior:'smooth',block:'start'});}
+function progress(k,n){$('cnt').textContent=`${Math.min(k+1,n)} / ${n}`;$('barI').style.width=(k/n*100)+'%';}
+function fb(el,ok,msg){el.hidden=false;el.className='fb '+(ok?'ok':'bad');el.innerHTML=msg;}
+function showRes(){cur='res';tabs();$('stage').hidden=true;$('resCard').hidden=false;renderCard();$('resCard').scrollIntoView({behavior:reduce?'auto':'smooth'});}
+function renderCard(){const nm=$('rName').value.trim(),cl=$('rClass').value.trim();let tot=0;
+ const rows=TASKS.map((t,i)=>{const n=starsOf(i);tot+=n;const s=ST.stats[i];return `<tr><td>${i+1}. ${esc(t.short)}</td><td class="st">${starStr(n)}</td><td>${ST.done[i]&&s?s.first+'/'+s.items:'–'}</td><td>${ST.done[i]&&s?s.tries:'–'}</td></tr>`;}).join('');
+ $('rcard').innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="font-family:var(--f-head);font-size:1.2rem">${esc(document.title)}</b><div style="color:#5A6678;font-size:.85rem">Results card</div></div><b style="font:700 1.5rem var(--f-num);color:#A97F0F">★ ${tot} / ${TASKS.length*3}</b></div>
+ <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;background:#F6F8FB;border-radius:10px;padding:10px"><div><small style="color:#5A6678">NAME</small><br><b style="color:${nm?'#1A2433':'#CC4B31'}">${nm?esc(nm):'type your name'}</b></div><div><small style="color:#5A6678">CLASS</small><br><b style="color:${cl?'#1A2433':'#CC4B31'}">${cl?esc(cl):'type your class'}</b></div><div><small style="color:#5A6678">DATE</small><br><b>${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</b></div></div>
+ <div style="overflow-x:auto"><table><tr><th>Task</th><th>Stars</th><th>First try</th><th>Tries</th></tr>${rows}</table></div>
+ <small style="color:#5A6678">★★★ = 80% or more right first time · ★★ = 50% or more</small>`;}
 ['rName','rClass'].forEach(id=>{const el=$(id);try{el.value=localStorage.getItem('lab-'+id)||'';}catch(e){}el.oninput=()=>{try{localStorage.setItem('lab-'+id,el.value);}catch(e){}renderCard();};});
-dots();openMission(cur);renderCard();loop();
+$('again').onclick=()=>{ST={done:{},stats:{}};save();go(0);};
+go(Object.keys(ST.done).length>=TASKS.length?0:Math.min(Object.keys(ST.done).length,TASKS.length-1));
 </script>
