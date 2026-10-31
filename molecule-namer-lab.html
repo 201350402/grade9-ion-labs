@@ -116,9 +116,9 @@ const SIM_ID='namer';
 const TASKS=[
 {short:'Spot it',title:'Covalent or ionic?',
  do:'Look at the elements. Tap Covalent or Ionic.',
- tip:'<b>Covalent</b> = two <b>non-metals</b>. <b>Ionic</b> = a <b>metal</b> + a non-metal. Metals in this task: Na, K, Mg, Ca.',
+ tip:'<b>Covalent</b> = two <b>non-metals</b>. <b>Ionic</b> = a <b>metal</b> + a non-metal. Metals in this task: Na, Mg.',
  learned:'A compound made of <b>two non-metals</b> is covalent. A <b>metal</b> + a non-metal is ionic.',
- run(area,api){const items=[['CO₂','C','O',0],['NaCl','Na','Cl',1],['NCl₃','N','Cl',0],['MgO','Mg','O',1],['SO₂','S','O',0],['KBr','K','Br',1],['PCl₃','P','Cl',0],['CaCl₂','Ca','Cl',1]];
+ run(area,api){const items=[['CO₂','C','O',0],['NaCl','Na','Cl',1],['NCl₃','N','Cl',0],['MgO','Mg','O',1],['SO₂','S','O',0]];
   let k=0;
   function show(){progress(k,items.length);if(k>=items.length){api.finish();return;}const [f,a,b,ion]=items[k];
    area.innerHTML=`<div class="big pop">${f}</div><p class="sub2">${EL[a].n} + ${EL[b].n}</p><div class="row"><button class="btn wide" type="button" data-v="0">Covalent</button><button class="btn wide ghost" type="button" data-v="1">Ionic</button></div><p class="fb" hidden></p>`;
