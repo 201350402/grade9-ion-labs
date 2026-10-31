@@ -118,7 +118,7 @@ const TASKS=[
  do:'Read the prefix. Tap the number it means.',
  tip:'In a formula, this number becomes the small number (subscript) after the symbol.',
  learned:'Each prefix is a number: di 2 → O₂, tri 3 → O₃, tetra 4 → Cl₄. No prefix on the first element = 1.',
- run(area,api){const items=[2,4,3,6,1,5,10,8];let k=0;
+ run(area,api){const items=[2,4,1,6,5];let k=0;
   function show(){progress(k,items.length);if(k>=items.length){api.finish();return;}const n=items[k];
    area.innerHTML=`<div class="big pop">${PRE[n]}-</div><div class="keys">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="chip" type="button" data-v="${v}">${v}</button>`).join('')}</div><p class="fb" hidden></p>`;
    const fbE=area.querySelector('.fb');
